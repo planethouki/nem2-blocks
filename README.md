@@ -1,1 +1,0 @@
-# nem2-blocks
