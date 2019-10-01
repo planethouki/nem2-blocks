@@ -1,68 +1,105 @@
 <template>
-  <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        nem2-blocks
-      </h1>
-      <h2 class="subtitle">
-        nem2-blocks
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green">
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
+  <div class="container-fluid">
+    <b-table
+      hover
+      primary-key="Timestamp"
+      :items="blocks"
+      :tbody-transition-props="transProps"
+    ></b-table>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-
 export default {
-  components: {
-    Logo
+  components: {},
+  data() {
+    return {
+      transProps: {
+        // Transition name
+        name: 'flip-list'
+      },
+      blocks: [],
+      socket: null,
+      host: 'elephant3.48gh23s.xyz:3000'
+    }
+  },
+  computed: {
+    url() {
+      return `http://${this.host}`
+    },
+    ws() {
+      return `ws://${this.host}/ws`
+    }
+  },
+  mounted() {
+    this.render()
+    this.startWs()
+  },
+  destroyed() {
+    this.finishWs()
+  },
+  methods: {
+    blockHandler(b) {
+      const copy = [
+        {
+          Height: b.block.height,
+          Timestamp: b.block.timestamp,
+          Harvester: b.block.signerPublicKey,
+          '#TXes': b.meta.numTransactions,
+          Fees: b.meta.totalFee
+        },
+        ...JSON.parse(JSON.stringify(this.blocks))
+      ]
+      this.blocks = copy.slice(0, 100)
+    },
+    startWs() {
+      this.socket = new WebSocket(this.ws)
+      this.socket.onopen = () => {
+        // eslint-disable-next-line no-console
+        console.log('connection open')
+      }
+      this.socket.onclose = () => {
+        // eslint-disable-next-line no-console
+        console.log('connection close')
+      }
+      this.socket.onmessage = (e) => {
+        const obj = JSON.parse(e.data)
+        if ('uid' in obj) {
+          this.socket.send('{"uid": "' + obj.uid + '", "subscribe":"block"}')
+        } else if ('block' in obj) this.blockHandler(obj)
+      }
+    },
+    finishWs() {
+      if (this.socket) this.socket.close()
+    },
+    render() {
+      this.$axios
+        .$get(`${this.url}/chain/height`)
+        .then((height) => {
+          const q = Math.floor((Number(height.height) - 1) / 100) * 100 + 1
+          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
+        })
+        .then((blocks) => {
+          this.blocks = blocks.map((b) => {
+            return {
+              Height: b.block.height,
+              Timestamp: b.block.timestamp,
+              Harvester: b.block.signerPublicKey,
+              '#TXes': b.meta.numTransactions,
+              Fees: b.meta.totalFee
+            }
+          })
+        })
+    },
+    clear() {
+      this.blocks = []
+    }
   }
 }
 </script>
 
 <style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+.flip-list-move {
+  transition: transform 1s;
 }
 </style>
