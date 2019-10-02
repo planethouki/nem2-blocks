@@ -8,7 +8,7 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item to="/blocks/0">Blocks</b-nav-item>
-          <b-nav-item href="#" disabled>Statistics</b-nav-item>
+          <b-nav-item to="/statistics">Statistics</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->

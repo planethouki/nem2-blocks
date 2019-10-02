@@ -1,6 +1,12 @@
 # nem2-blocks
 
-> nem2-blocks
+- for elephant3
+- only block information
+- temporary until official block explorer comes out
+
+[demo](http://nem2blocks.z31.web.core.windows.net)
+
+![alt](cap1.png)
 
 ## Build Setup
 
