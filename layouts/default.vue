@@ -13,21 +13,15 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-nav-form>
-            <b-form-input
-              v-model="inputHost"
-              size="sm"
-              class="mr-sm-2"
-              placeholder="Host"
-            ></b-form-input>
-            <b-button
-              size="sm"
-              class="my-2 my-sm-0"
-              type="submit"
-              @click="changeHost"
-              >Host</b-button
-            >
-          </b-nav-form>
+          <b-form-input
+            v-model="inputHost"
+            size="sm"
+            class="mr-sm-2"
+            placeholder="Host"
+          ></b-form-input>
+          <b-button size="sm" class="my-2 my-sm-0" @click="changeHost"
+            >Host</b-button
+          >
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>

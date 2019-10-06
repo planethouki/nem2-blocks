@@ -1,5 +1,5 @@
 export const state = () => ({
-  host: 'elephant3.48gh23s.xyz:3000',
+  host: 'fushicho.48gh23s.xyz:3000',
   currentHeight: 0,
   newBlock: { meta: {}, block: {} }
 })
