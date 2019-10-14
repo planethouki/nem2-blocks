@@ -92,7 +92,7 @@ export default {
           return {
             timestamp: Number(b.block.timestamp),
             height: b.block.height,
-            numTransactions: Number(b.meta.numTransactions),
+            numTransactions: b.meta.numTransactions,
             totalFee: Number(b.meta.totalFee)
           }
         })

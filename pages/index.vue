@@ -106,7 +106,7 @@ export default {
     },
     signerToCount() {
       if (this.blocks.length === 0) {
-        return []
+        return {}
       }
       const signerToCount = {}
       for (const b of this.blocks) {
