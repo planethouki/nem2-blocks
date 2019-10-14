@@ -81,6 +81,7 @@ export default {
     },
     clearChain() {
       this.$store.dispatch('setStorage', { storage: {} })
+      this.$sotre.dispatch('setNewBlock', { newBlock: { meta: {}, block: {} } })
     },
     startWs() {
       this.socket = new WebSocket(this.ws)
