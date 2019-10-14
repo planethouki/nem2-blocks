@@ -1,21 +1,66 @@
 <template>
   <div class="container">
-    <div
-      v-for="(value, key) in storage"
-      :key="key"
-      class="d-flex justify-content-between"
-      style="max-width: 300px;"
-    >
-      <span>{{ key }}</span>
-      <span>{{ value }}</span>
+    <div class="card">
+      <div class="card-body">
+        <div
+          v-for="(value, key) in storage"
+          :key="key"
+          class="d-flex justify-content-between"
+          style="max-width: 300px;"
+        >
+          <span>{{ key }}</span>
+          <span>{{ value }}</span>
+        </div>
+      </div>
     </div>
-    <GChart
-      v-if="blocks.length > 0"
-      :settings="{ packages: ['corechart'] }"
-      type="LineChart"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <div class="card p-1" style="height: 400px;">
+      <GChart
+        v-if="blocks.length > 0"
+        :settings="{ packages: ['corechart'] }"
+        type="LineChart"
+        :data="blockTimeChartData"
+        :options="blockTimeChartOptions"
+        style="height: 100%; width: 100%;"
+      />
+      <div
+        v-else
+        class="d-flex justify-content-center align-items-center h-100"
+      >
+        <b-spinner type="grow" label="Spinning"></b-spinner>
+      </div>
+    </div>
+    <div class="card p-1" style="height: 400px;">
+      <GChart
+        v-if="blocks.length > 0"
+        :settings="{ packages: ['corechart'] }"
+        type="LineChart"
+        :data="transactionsChartData"
+        :options="transactionsChartOptions"
+        style="height: 100%; width: 100%;"
+      />
+      <div
+        v-else
+        class="d-flex justify-content-center align-items-center h-100"
+      >
+        <b-spinner type="grow" label="Spinning"></b-spinner>
+      </div>
+    </div>
+    <div class="card p-1" style="height: 400px;">
+      <GChart
+        v-if="blocks.length > 0"
+        :settings="{ packages: ['corechart'] }"
+        type="LineChart"
+        :data="transactionFeeChartData"
+        :options="transactionFeeChartOptions"
+        style="height: 100%; width: 100%;"
+      />
+      <div
+        v-else
+        class="d-flex justify-content-center align-items-center h-100"
+      >
+        <b-spinner type="grow" label="Spinning"></b-spinner>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,23 +72,28 @@ export default {
   components: { GChart },
   data() {
     return {
-      chartOptions: {
-        title: 'Block time differences (last 241 blocks)',
-        width: 900,
-        height: 400
+      blockTimeChartOptions: {
+        title: 'Block time differences (last 241 blocks)'
       },
-      blocks: [],
-      storage: {}
+      transactionsChartOptions: {
+        title: 'Transactions per block (last 241 blocks)'
+      },
+      transactionFeeChartOptions: {
+        title: 'Fee per block (last 241 blocks)'
+      },
+      blocks: []
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'currentHeight']),
-    chartData() {
-      const q = this.blocks
+    ...mapGetters(['url', 'ws', 'currentHeight', 'storage']),
+    blocksForChart() {
+      return this.blocks
         .map((b) => {
           return {
             timestamp: Number(b.block.timestamp),
-            height: b.block.height
+            height: b.block.height,
+            numTransactions: Number(b.meta.numTransactions),
+            totalFee: Number(b.meta.totalFee)
           }
         })
         .sort((x, y) => {
@@ -57,11 +107,14 @@ export default {
           }
           return 0
         })
+    },
+    blockTimeChartData() {
+      const q = this.blocksForChart
         .map((b, idx, org) => {
           if (idx === 0) {
-            return [b.height, 0, 0]
+            return [b.height, null, null]
           } else if (idx < 61) {
-            return [b.height, b.timestamp - org[idx - 1].timestamp, 0]
+            return [b.height, b.timestamp - org[idx - 1].timestamp, null]
           }
           return [
             b.height,
@@ -78,26 +131,90 @@ export default {
         ],
         ...q
       ]
+    },
+    transactionsChartData() {
+      const q = this.blocksForChart
+        .map((b, idx, org) => {
+          if (idx === 0) {
+            return [b.height, null, null]
+          } else if (idx < 61) {
+            return [b.height, b.numTransactions, null]
+          }
+          return [
+            b.height,
+            b.numTransactions,
+            org
+              .slice(idx - 60, idx)
+              .map((b) => b.numTransactions)
+              .reduce((prev, curr) => {
+                return prev + curr
+              }) / 60
+          ]
+        })
+        .slice(1)
+      return [
+        [
+          'Height',
+          'Number of transactions',
+          'Avg number of transactions (per 60 blocks)'
+        ],
+        ...q
+      ]
+    },
+    transactionFeeChartData() {
+      const q = this.blocksForChart
+        .map((b, idx, org) => {
+          if (idx === 0) {
+            return [b.height, null, null]
+          } else if (idx < 61) {
+            return [b.height, b.totalFee, null]
+          }
+          return [
+            b.height,
+            b.totalFee,
+            org
+              .slice(idx - 60, idx)
+              .map((b) => b.totalFee)
+              .reduce((prev, curr) => {
+                return prev + curr
+              }) / 60
+          ]
+        })
+        .slice(1)
+      return [['Height', 'Fee', 'Avg fee (per 60 blocks)'], ...q]
     }
   },
   mounted() {
-    this.$axios.$get(`${this.url}/diagnostic/storage`).then((res) => {
-      this.storage = res
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'host') {
+        this.$nextTick(() => {
+          this.get()
+        })
+      }
     })
-    this.$axios
-      .$get(`${this.url}/chain/height`)
-      .then((res) => {
-        this.$store.dispatch('setCurrentHeight', { currentHeight: res.height })
-        const q = Math.max(Number(res.height) - 241, 1)
-        return this.$axios.$get(`${this.url}/diagnostic/blocks/${q}/limit/241`)
-      })
-      .then((res) => {
-        this.blocks = res
-      })
+    this.get()
   },
   destroyed() {},
-  methods: {}
+  methods: {
+    get() {
+      this.$axios
+        .$get(`${this.url}/chain/height`)
+        .then((res) => {
+          const q = Math.max(Number(res.height) - 241, 1)
+          return this.$axios.$get(
+            `${this.url}/diagnostic/blocks/${q}/limit/241`
+          )
+        })
+        .then((res) => {
+          this.blocks = res
+        })
+    }
+  }
 }
 </script>
 
-<style></style>
+<style>
+.card {
+  margin-top: 1rem;
+}
+</style>

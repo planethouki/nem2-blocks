@@ -136,9 +136,6 @@ export default {
       this.$axios
         .$get(`${this.url}/chain/height`)
         .then((res) => {
-          this.$store.dispatch('setCurrentHeight', {
-            currentHeight: res.height
-          })
           const q = this.floor100(
             this.$route.params.height === '0'
               ? res.height

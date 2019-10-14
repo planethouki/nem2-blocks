@@ -41,7 +41,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'currentHeight']),
+    ...mapGetters(['url', 'ws']),
     validatedHost() {
       const a1 = this.inputHost
       const a2 = a1.trim()
@@ -54,11 +54,14 @@ export default {
   mounted() {
     this.inputHost = this.$store.state.host
     this.startWs()
+    this.getChain()
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'host') {
         this.$nextTick(() => {
           this.finishWs()
           this.startWs()
+          this.clearChain()
+          this.getChain()
         })
       }
     })
@@ -71,8 +74,13 @@ export default {
       const host = this.validatedHost
       this.$store.dispatch('setHost', { host })
     },
-    blockHandler(obj) {
-      this.$store.dispatch('setNewBlock', { newBlock: obj })
+    getChain() {
+      this.$axios.$get(`${this.url}/diagnostic/storage`).then((res) => {
+        this.$store.dispatch('setStorage', { storage: res })
+      })
+    },
+    clearChain() {
+      this.$store.dispatch('setStorage', { storage: {} })
     },
     startWs() {
       this.socket = new WebSocket(this.ws)
@@ -93,57 +101,21 @@ export default {
     },
     finishWs() {
       if (this.socket) this.socket.close()
+    },
+    blockHandler(obj) {
+      this.$store.dispatch('setNewBlock', { newBlock: obj })
+      this.getChain()
     }
   }
 }
 </script>
 
 <style>
-html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.1s;
 }
-
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
-
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
+.page-enter, .page-leave-to /* .page-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
