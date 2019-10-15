@@ -50,6 +50,83 @@
         </div>
       </div>
     </div>
+    <div class="row no-gutters">
+      <div class="col col-12 col-md-6">
+        <div class="card m-3">
+          <div class="card-body">
+            <h5>
+              Latest blocks
+            </h5>
+            <div
+              v-for="b in latestBlocksData"
+              :key="b.hash"
+              class="d-flex align-items-center border-bottom my-2 py-2"
+            >
+              <div class="p-2 mr-3">
+                {{ b.height }}
+              </div>
+              <div class="text-truncate mx-3">
+                <div class="text-truncate">
+                  Harvester {{ b.signerPublicKey }}
+                </div>
+                <div>{{ b.numTransactions }} transactions</div>
+              </div>
+              <div class="ml-3 text-right">
+                <div class="text-nowrap">
+                  {{ b.totalFee }}
+                  <small>total fee</small>
+                </div>
+                <div class="text-muted text-nowrap" style="font-size: 80%;">
+                  {{ b.timeDiff }}
+                  <small>ms ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-12 col-md-6">
+        <div class="card m-3">
+          <div class="card-body">
+            <h5>
+              Latest transactions
+            </h5>
+            <div v-if="latestTransactionsData.length === 0">
+              None
+            </div>
+            <div
+              v-for="t in latestTransactionsData"
+              :key="t.hash"
+              class="d-flex align-items-center border-bottom my-2 py-2"
+            >
+              <div class="text-truncate mr-3" style="width: 8rem;">
+                {{ t.hash }}
+              </div>
+              <div class="text-truncate mx-3">
+                <div class="text-truncate">
+                  Sender
+                  {{ t.signerPublicKey }}
+                </div>
+                <div>
+                  Type
+                  {{ t.type }}
+                </div>
+              </div>
+              <div class="ml-3 text-right">
+                <div class="text-nowrap">
+                  {{ t.maxFee }}
+                  <small>max fee</small>
+                </div>
+                <div class="text-muted text-nowrap" style="font-size: 80%;">
+                  {{ t.height }}
+                  height
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,7 +139,7 @@ export default {
   data() {
     return {
       harvesterPiChartOptions: {
-        title: 'Harvester (last 241 blocks)'
+        title: 'Harvester (last 100 blocks)'
       },
       harvesterTableFields: [
         { key: 'rank', label: 'Rank', class: 'text-center' },
@@ -74,7 +151,9 @@ export default {
         { key: 'count', label: 'Blocks' },
         { key: 'fee', label: 'Fee' }
       ],
-      blocks: []
+      blocks: [],
+      transactions: [],
+      now: Date.now()
     }
   },
   computed: {
@@ -159,6 +238,57 @@ export default {
         ]
       })
       return [['Signer', 'Count'], ...q]
+    },
+    latestTransactionsData() {
+      return this.transactions.map((t) => {
+        return {
+          hash: t.meta.hash,
+          signerPublicKey: t.transaction.signerPublicKey,
+          maxFee: t.transaction.maxFee,
+          height: t.meta.height,
+          type: t.transaction.type
+        }
+      })
+    },
+    latestBlocksData() {
+      return this.blocks.slice(0, 10).map((b) => {
+        return {
+          hash: b.meta.hash,
+          timeDiff: this.now - Number(b.block.timestamp) - 1459468800000,
+          height: b.block.height,
+          signerPublicKey: b.block.signerPublicKey,
+          numTransactions: b.meta.numTransactions,
+          totalFee: Number(b.meta.totalFee)
+        }
+      })
+    }
+  },
+  watch: {
+    blocks() {
+      if (this.blocks.length === 0) {
+        return {}
+      }
+      const getTransactionsPromises = this.blocks
+        .filter((b) => {
+          return b.meta.numTransactions > 0
+        })
+        .map((b) => {
+          return b.block.height
+        })
+        .sort((a, b) => {
+          return Number(b) - Number(a)
+        })
+        .slice(0, 10)
+        .map((h) => {
+          return this.$axios.$get(`${this.url}/block/${h}/transactions`)
+        })
+      Promise.all(getTransactionsPromises).then((results) => {
+        const transactions = []
+        for (const result of results) {
+          transactions.push(...result)
+        }
+        this.transactions = transactions
+      })
     }
   },
   mounted() {
@@ -170,15 +300,21 @@ export default {
       }
     })
     this.get()
+    this.secondsInterval = setInterval(() => {
+      this.now = Date.now()
+    }, 1000)
+  },
+  destroyed() {
+    clearInterval(this.secondsInterval)
   },
   methods: {
     get() {
       this.$axios
         .$get(`${this.url}/chain/height`)
         .then((res) => {
-          const q = Math.max(Number(res.height) - 241, 1)
+          const q = Math.max(Number(res.height) - 99, 1)
           return this.$axios.$get(
-            `${this.url}/diagnostic/blocks/${q}/limit/241`
+            `${this.url}/diagnostic/blocks/${q}/limit/100`
           )
         })
         .then((res) => {
