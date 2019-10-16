@@ -14,6 +14,7 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-form-input
+            id="input-host"
             v-model="inputHost"
             size="sm"
             class="mr-sm-2"
@@ -81,7 +82,7 @@ export default {
     },
     clearChain() {
       this.$store.dispatch('setStorage', { storage: {} })
-      this.$sotre.dispatch('setNewBlock', { newBlock: { meta: {}, block: {} } })
+      this.$store.dispatch('setNewBlock', { newBlock: { meta: {}, block: {} } })
     },
     startWs() {
       this.socket = new WebSocket(this.ws)

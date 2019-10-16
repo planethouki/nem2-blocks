@@ -57,31 +57,33 @@
             <h5>
               Latest blocks
             </h5>
-            <div
-              v-for="b in latestBlocksData"
-              :key="b.hash"
-              class="d-flex align-items-center border-bottom my-2 py-2"
-            >
-              <div class="p-2 mr-3">
-                {{ b.height }}
-              </div>
-              <div class="text-truncate mx-3">
-                <div class="text-truncate">
-                  Harvester {{ b.signerPublicKey }}
+            <transition-group name="block-list" tag="div">
+              <div
+                v-for="b in latestBlocksData"
+                :key="b.hash"
+                class="d-flex align-items-center border-bottom my-2 py-2"
+              >
+                <div class="p-2 mr-3">
+                  {{ b.height }}
                 </div>
-                <div>{{ b.numTransactions }} transactions</div>
-              </div>
-              <div class="ml-3 text-right">
-                <div class="text-nowrap">
-                  {{ b.totalFee }}
-                  <small>total fee</small>
+                <div class="text-truncate mx-3">
+                  <div class="text-truncate">
+                    Harvester {{ b.signerPublicKey }}
+                  </div>
+                  <div>{{ b.numTransactions }} transactions</div>
                 </div>
-                <div class="text-muted text-nowrap" style="font-size: 80%;">
-                  {{ b.timeDiff }}
-                  <small>ms ago</small>
+                <div class="ml-3 text-right">
+                  <div class="text-nowrap">
+                    {{ b.totalFee }}
+                    <small>total fee</small>
+                  </div>
+                  <div class="text-muted text-nowrap" style="font-size: 80%;">
+                    {{ b.timeDiff }}
+                    <small>ms ago</small>
+                  </div>
                 </div>
               </div>
-            </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -94,35 +96,37 @@
             <div v-if="latestTransactionsData.length === 0">
               None
             </div>
-            <div
-              v-for="t in latestTransactionsData"
-              :key="t.hash"
-              class="d-flex align-items-center border-bottom my-2 py-2"
-            >
-              <div class="text-truncate mr-3" style="width: 8rem;">
-                {{ t.hash }}
+            <transition-group name="transaction-list" tag="div">
+              <div
+                v-for="t in latestTransactionsData"
+                :key="t.hash"
+                class="d-flex align-items-center border-bottom my-2 py-2"
+              >
+                <div class="text-truncate mr-3" style="width: 8rem;">
+                  {{ t.hash }}
+                </div>
+                <div class="text-truncate mx-3">
+                  <div class="text-truncate">
+                    Sender
+                    {{ t.signerPublicKey }}
+                  </div>
+                  <div>
+                    Type
+                    {{ t.type }}
+                  </div>
+                </div>
+                <div class="ml-3 text-right">
+                  <div class="text-nowrap">
+                    {{ t.maxFee }}
+                    <small>max fee</small>
+                  </div>
+                  <div class="text-muted text-nowrap" style="font-size: 80%;">
+                    {{ t.height }}
+                    height
+                  </div>
+                </div>
               </div>
-              <div class="text-truncate mx-3">
-                <div class="text-truncate">
-                  Sender
-                  {{ t.signerPublicKey }}
-                </div>
-                <div>
-                  Type
-                  {{ t.type }}
-                </div>
-              </div>
-              <div class="ml-3 text-right">
-                <div class="text-nowrap">
-                  {{ t.maxFee }}
-                  <small>max fee</small>
-                </div>
-                <div class="text-muted text-nowrap" style="font-size: 80%;">
-                  {{ t.height }}
-                  height
-                </div>
-              </div>
-            </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -157,7 +161,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'storage']),
+    ...mapGetters(['url', 'ws', 'storage', 'currentHeight']),
     topCardList() {
       if (!this.storage.numBlocks) {
         return []
@@ -287,7 +291,7 @@ export default {
         for (const result of results) {
           transactions.push(...result)
         }
-        this.transactions = transactions
+        this.transactions = transactions.slice(0, 20)
       })
     }
   },
@@ -296,6 +300,13 @@ export default {
       if (mutation.type === 'host') {
         this.$nextTick(() => {
           this.get()
+        })
+      } else if (
+        mutation.type === 'newBlock' &&
+        state.newBlock.block.height !== undefined
+      ) {
+        this.$nextTick(() => {
+          this.addNewBlock()
         })
       }
     })
@@ -320,6 +331,14 @@ export default {
         .then((res) => {
           this.blocks = res
         })
+    },
+    addNewBlock() {
+      this.$axios.$get(`${this.url}/block/${this.currentHeight}`).then((b) => {
+        const blocks = JSON.parse(JSON.stringify(this.blocks))
+        blocks.splice(0, 0, b)
+        blocks.splice(-1, 1)
+        this.blocks = blocks
+      })
     }
   }
 }
@@ -330,5 +349,9 @@ export default {
   font-size: 80%;
   vertical-align: middle !important;
   font-family: monospace;
+}
+.transaction-list-move,
+.block-list-move {
+  transition: transform 0.3s;
 }
 </style>
