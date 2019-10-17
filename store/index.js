@@ -11,7 +11,11 @@ const host = (() => {
 export const state = () => ({
   host,
   newBlock: { meta: {}, block: {} },
-  storage: {}
+  storage: {},
+  infoHostChange: {
+    host: null,
+    redirectPah: null
+  }
 })
 
 export const getters = {
@@ -48,6 +52,9 @@ export const mutations = {
   },
   storage(state, { storage }) {
     state.storage = storage
+  },
+  infoHostChange(state, { infoHostChange }) {
+    state.infoHostChange = infoHostChange
   }
 }
 
@@ -61,7 +68,24 @@ export const actions = {
   setNewBlock({ commit }, { newBlock }) {
     commit('newBlock', { newBlock })
   },
+  deleteNewBlock({ commit }) {
+    commit('newBlock', { newBlock: { meta: {}, block: {} } })
+  },
   setStorage({ commit }, { storage }) {
     commit('storage', { storage })
+  },
+  deleteStorage({ commit }) {
+    commit('storage', { storage: {} })
+  },
+  setInfoHostChange({ commit }, { infoHostChange }) {
+    commit('infoHostChange', { infoHostChange })
+  },
+  deleteInfoHostChange({ commit }) {
+    commit('infoHostChange', {
+      infoHostChange: {
+        host: null,
+        redirectPah: null
+      }
+    })
   }
 }

@@ -61,8 +61,6 @@ export default {
         this.$nextTick(() => {
           this.finishWs()
           this.startWs()
-          this.clearChain()
-          this.getChain()
         })
       }
     })
@@ -72,17 +70,18 @@ export default {
   },
   methods: {
     changeHost() {
-      const host = this.validatedHost
-      this.$store.dispatch('setHost', { host })
+      this.$store.dispatch('setInfoHostChange', {
+        infoHostChange: {
+          host: this.validatedHost,
+          redirectPath: this.$router.currentRoute.fullPath
+        }
+      })
+      this.$router.push('/host')
     },
     getChain() {
       this.$axios.$get(`${this.url}/diagnostic/storage`).then((res) => {
         this.$store.dispatch('setStorage', { storage: res })
       })
-    },
-    clearChain() {
-      this.$store.dispatch('setStorage', { storage: {} })
-      this.$store.dispatch('setNewBlock', { newBlock: { meta: {}, block: {} } })
     },
     startWs() {
       this.socket = new WebSocket(this.ws)

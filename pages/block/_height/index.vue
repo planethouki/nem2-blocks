@@ -36,13 +36,6 @@ export default {
   },
   mounted() {
     this.get()
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'host') {
-        this.$nextTick(() => {
-          this.get()
-        })
-      }
-    })
   },
   methods: {
     get() {

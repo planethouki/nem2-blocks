@@ -297,16 +297,12 @@ export default {
   },
   mounted() {
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'host') {
-        this.$nextTick(() => {
-          this.get()
-        })
-      } else if (
+      if (
         mutation.type === 'newBlock' &&
         state.newBlock.block.height !== undefined
       ) {
         this.$nextTick(() => {
-          this.addNewBlock()
+          this.addNewBlock(mutation.payload.newBlock)
         })
       }
     })
@@ -332,13 +328,13 @@ export default {
           this.blocks = res
         })
     },
-    addNewBlock() {
-      this.$axios.$get(`${this.url}/block/${this.currentHeight}`).then((b) => {
-        const blocks = JSON.parse(JSON.stringify(this.blocks))
-        blocks.splice(0, 0, b)
-        blocks.splice(-1, 1)
-        this.blocks = blocks
-      })
+    addNewBlock(newBlock) {
+      this.$axios
+        .$get(`${this.url}/block/${newBlock.block.height}`)
+        .then((b) => {
+          const copy = [b, ...JSON.parse(JSON.stringify(this.blocks))]
+          this.blocks = copy.slice(0, 100)
+        })
     }
   }
 }

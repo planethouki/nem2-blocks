@@ -185,13 +185,6 @@ export default {
     }
   },
   mounted() {
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'host') {
-        this.$nextTick(() => {
-          this.get()
-        })
-      }
-    })
     this.get()
   },
   destroyed() {},

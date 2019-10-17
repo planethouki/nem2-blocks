@@ -71,12 +71,7 @@ export default {
     document.addEventListener('keyup', this.arrowKeyHandler)
     this.render()
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'host') {
-        this.$nextTick(() => {
-          this.clear()
-          this.render()
-        })
-      } else if (mutation.type === 'newBlock') {
+      if (mutation.type === 'newBlock') {
         this.$nextTick(() => {
           this.blockHandler(mutation.payload.newBlock)
         })
