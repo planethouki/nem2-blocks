@@ -1,10 +1,18 @@
 <template>
-  <div>Transfer</div>
+  <div>
+    <span>Transfer</span>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Transfer'
+  name: 'Transfer',
+  props: {
+    transaction: {
+      type: Object,
+      required: true
+    }
+  }
 }
 </script>
 

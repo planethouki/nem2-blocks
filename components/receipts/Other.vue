@@ -1,10 +1,19 @@
 <template>
-  <div>Other</div>
+  <div>
+    <pre>{{ JSON.stringify(receipt, null, '  ') }}</pre>
+    <div>Other</div>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Other'
+  name: 'Other',
+  props: {
+    receipt: {
+      type: Object,
+      required: true
+    }
+  }
 }
 </script>
 

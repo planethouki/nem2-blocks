@@ -1,10 +1,19 @@
 <template>
-  <div>Inflation</div>
+  <div>
+    <div>Inflation</div>
+    <pre>{{ JSON.stringify(receipt, null, '  ') }}</pre>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Inflation'
+  name: 'Inflation',
+  props: {
+    receipt: {
+      type: Object,
+      required: true
+    }
+  }
 }
 </script>
 

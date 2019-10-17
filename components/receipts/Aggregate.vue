@@ -1,10 +1,19 @@
 <template>
-  <div>Aggregate</div>
+  <div>
+    <div>Aggregate</div>
+    <pre>{{ JSON.stringify(receipt, null, '  ') }}</pre>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Aggregate'
+  name: 'Aggregate',
+  props: {
+    receipt: {
+      type: Object,
+      required: true
+    }
+  }
 }
 </script>
 

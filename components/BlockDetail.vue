@@ -35,10 +35,6 @@
         <span>{{ block.meta.totalFee }}</span>
       </div>
       <div class="d-flex justify-content-between">
-        <span>Fees</span>
-        <span>{{ block.meta.totalFee }}</span>
-      </div>
-      <div class="d-flex justify-content-between">
         <span>State hash</span>
         <span>{{ block.block.stateHash }}</span>
       </div>
