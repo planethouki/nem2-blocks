@@ -1,6 +1,6 @@
 # nem2-blocks
 
-- for elephant3
+- for fushicho
 - only block information
 - temporary until official block explorer comes out
 

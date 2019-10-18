@@ -7,7 +7,34 @@
       :fields="fields"
       :items="blockItems"
       :tbody-transition-props="transProps"
-    ></b-table>
+    >
+      <template v-slot:cell(block.height)="data">
+        <a :href="`${url}/block/${data.value}`" target="_blank">{{
+          data.value
+        }}</a>
+      </template>
+      <template v-slot:cell(block.signerPublicKey)="data">
+        <a :href="`${url}/account/${data.value}`" target="_blank">{{
+          data.value
+        }}</a>
+      </template>
+      <template v-slot:cell(meta.numTransactions)="data">
+        <a
+          :href="`${url}/block/${data.item.block.height}/transactions`"
+          target="_blank"
+        >
+          {{ data.value }}
+        </a>
+      </template>
+      <template v-slot:cell(meta.numStatements)="data">
+        <a
+          :href="`${url}/block/${data.item.block.height}/receipts`"
+          target="_blank"
+        >
+          {{ data.value }}
+        </a>
+      </template>
+    </b-table>
     <b-button :disabled="prevBtnDisabled" @click="prevBtnClick"
       >Previous</b-button
     >
@@ -26,8 +53,7 @@ export default {
   data() {
     return {
       transProps: {
-        // Transition name
-        name: 'flip-list'
+        name: 'block-list'
       },
       blocks: [],
       fields: [
@@ -35,13 +61,21 @@ export default {
         {
           key: 'block.timestamp',
           label: 'Timestamp',
+          class: 'd-none d-sm-table-cell',
           formatter: (value) => {
             return this.formatTimestamp(value)
           }
         },
-        { key: 'block.signerPublicKey', label: 'Harvester' },
+        {
+          key: 'block.signerPublicKey',
+          label: 'Harvester',
+          tdClass: 'text-monospace',
+          class: 'd-none d-lg-table-cell'
+        },
         { key: 'meta.numTransactions', label: '#TXes' },
-        { key: 'meta.totalFee', label: 'Fees' }
+        { key: 'meta.numStatements', label: 'Stmts' },
+        { key: 'meta.totalFee', label: 'Fees' },
+        { key: 'block.feeMultiplier', label: 'Fee mul' }
       ]
     }
   },
@@ -114,15 +148,13 @@ export default {
     },
     blockHandler(b) {
       this.$axios.$get(`${this.url}/block/${b.block.height}`).then((res) => {
-        b.meta.totalFee = res.meta.totalFee
-        b.meta.numTransactions = res.meta.numTransactions
         const currentHeight100 = this.floor100(this.currentHeight)
         const height100 = this.floor100(this.$route.params.height)
         if (
           this.$route.params.height === '0' ||
           currentHeight100 === height100
         ) {
-          const copy = [b, ...JSON.parse(JSON.stringify(this.blocks))]
+          const copy = [res, ...JSON.parse(JSON.stringify(this.blocks))]
           this.blocks = copy.slice(0, 100)
         }
       })
@@ -153,7 +185,17 @@ export default {
 </script>
 
 <style>
-.flip-list-move {
+.block-list-move {
   transition: transform 1s;
+}
+</style>
+
+<style scoped>
+a {
+  color: #35495e;
+  text-decoration: underline;
+}
+a:hover {
+  text-decoration: none;
 }
 </style>

@@ -61,6 +61,22 @@
         <b-spinner type="grow" label="Spinning"></b-spinner>
       </div>
     </div>
+    <div class="card p-1" style="height: 400px;">
+      <GChart
+        v-if="blocks.length > 0"
+        :settings="{ packages: ['corechart'] }"
+        type="LineChart"
+        :data="transactionFeeMulChartData"
+        :options="transactionFeeMulChartOptions"
+        style="height: 100%; width: 100%;"
+      />
+      <div
+        v-else
+        class="d-flex justify-content-center align-items-center h-100"
+      >
+        <b-spinner type="grow" label="Spinning"></b-spinner>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -76,10 +92,13 @@ export default {
         title: 'Block time differences (last 241 blocks)'
       },
       transactionsChartOptions: {
-        title: 'Transactions per block (last 241 blocks)'
+        title: 'Transactions per block (last 240 blocks)'
       },
       transactionFeeChartOptions: {
-        title: 'Fee per block (last 241 blocks)'
+        title: 'Fee per block (last 240 blocks)'
+      },
+      transactionFeeMulChartOptions: {
+        title: 'Fee multiplier per block (last 240 blocks)'
       },
       blocks: []
     }
@@ -93,7 +112,8 @@ export default {
             timestamp: Number(b.block.timestamp),
             height: b.block.height,
             numTransactions: b.meta.numTransactions,
-            totalFee: Number(b.meta.totalFee)
+            totalFee: Number(b.meta.totalFee),
+            feeMultiplier: b.block.feeMultiplier
           }
         })
         .sort((x, y) => {
@@ -182,6 +202,31 @@ export default {
         })
         .slice(1)
       return [['Height', 'Fee', 'Avg fee (per 60 blocks)'], ...q]
+    },
+    transactionFeeMulChartData() {
+      const q = this.blocksForChart
+        .map((b, idx, org) => {
+          if (idx === 0) {
+            return [b.height, null, null]
+          } else if (idx < 61) {
+            return [b.height, b.feeMultiplier, null]
+          }
+          return [
+            b.height,
+            b.feeMultiplier,
+            org
+              .slice(idx - 60, idx)
+              .map((b) => b.feeMultiplier)
+              .reduce((prev, curr) => {
+                return prev + curr
+              }) / 60
+          ]
+        })
+        .slice(1)
+      return [
+        ['Height', 'Fee multiplier', 'Avg fee multiplier (per 60 blocks)'],
+        ...q
+      ]
     }
   },
   mounted() {

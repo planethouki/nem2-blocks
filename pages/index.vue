@@ -68,7 +68,10 @@
                 </div>
                 <div class="text-truncate mx-3">
                   <div class="text-truncate">
-                    Harvester {{ b.signerPublicKey }}
+                    Harvester
+                    <span class="text-monospace">
+                      {{ b.signerPublicKey }}
+                    </span>
                   </div>
                   <div>{{ b.numTransactions }} transactions</div>
                 </div>
@@ -108,7 +111,9 @@
                 <div class="text-truncate mx-3">
                   <div class="text-truncate">
                     Sender
-                    {{ t.signerPublicKey }}
+                    <span class="text-monospace">
+                      {{ t.signerPublicKey }}
+                    </span>
                   </div>
                   <div>
                     Type
@@ -150,10 +155,10 @@ export default {
         {
           key: 'signerPublicKey',
           label: 'Harvester',
-          tdClass: 'harvesterFont'
+          tdClass: 'text-monospace small align-middle'
         },
         { key: 'count', label: 'Blocks' },
-        { key: 'fee', label: 'Fee' }
+        { key: 'fee', label: 'Fees earned' }
       ],
       blocks: [],
       transactions: [],
@@ -341,11 +346,6 @@ export default {
 </script>
 
 <style>
-.harvesterFont {
-  font-size: 80%;
-  vertical-align: middle !important;
-  font-family: monospace;
-}
 .transaction-list-move,
 .block-list-move {
   transition: transform 0.3s;
