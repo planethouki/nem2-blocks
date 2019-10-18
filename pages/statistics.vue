@@ -34,6 +34,22 @@
         v-if="blocks.length > 0"
         :settings="{ packages: ['corechart'] }"
         type="LineChart"
+        :data="difficultyChartData"
+        :options="difficultyChartOptions"
+        style="height: 100%; width: 100%;"
+      />
+      <div
+        v-else
+        class="d-flex justify-content-center align-items-center h-100"
+      >
+        <b-spinner type="grow" label="Spinning"></b-spinner>
+      </div>
+    </div>
+    <div class="card p-1" style="height: 400px;">
+      <GChart
+        v-if="blocks.length > 0"
+        :settings="{ packages: ['corechart'] }"
+        type="LineChart"
         :data="transactionsChartData"
         :options="transactionsChartOptions"
         style="height: 100%; width: 100%;"
@@ -91,6 +107,9 @@ export default {
       blockTimeChartOptions: {
         title: 'Block time differences (last 241 blocks)'
       },
+      difficultyChartOptions: {
+        title: 'Block difficulty (last 240 blocks)'
+      },
       transactionsChartOptions: {
         title: 'Transactions per block (last 240 blocks)'
       },
@@ -113,19 +132,14 @@ export default {
             height: b.block.height,
             numTransactions: b.meta.numTransactions,
             totalFee: Number(b.meta.totalFee),
-            feeMultiplier: b.block.feeMultiplier
+            feeMultiplier: b.block.feeMultiplier,
+            difficulty: Number(b.block.difficulty)
           }
         })
         .sort((x, y) => {
-          const a = x.height
-          const b = y.height
-          if (a < b) {
-            return -1
-          }
-          if (a > b) {
-            return 1
-          }
-          return 0
+          const a = Number(x.height)
+          const b = Number(y.height)
+          return a - b
         })
     },
     blockTimeChartData() {
@@ -148,6 +162,35 @@ export default {
           'Height',
           'Time Difference (in ms)',
           'Avg Time Difference (per 60 blocks)'
+        ],
+        ...q
+      ]
+    },
+    difficultyChartData() {
+      const q = this.blocksForChart
+        .map((b, idx, org) => {
+          if (idx === 0) {
+            return [b.height, null, null]
+          } else if (idx < 61) {
+            return [b.height, b.difficulty, null]
+          }
+          return [
+            b.height,
+            b.difficulty,
+            org
+              .slice(idx - 60, idx)
+              .map((b) => b.difficulty)
+              .reduce((prev, curr) => {
+                return prev + curr
+              }) / 60
+          ]
+        })
+        .slice(1)
+      return [
+        [
+          'Height',
+          'Number of transactions',
+          'Avg number of transactions (per 60 blocks)'
         ],
         ...q
       ]
