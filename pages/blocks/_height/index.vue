@@ -26,6 +26,10 @@
           {{ data.value }}
         </a>
       </template>
+      <template v-slot:cell(meta.totalFee)="data">
+        <span>{{ $formatter.intPart(data.value) }}</span
+        >.<span class="small">{{ $formatter.fracPart(data.value) }}</span>
+      </template>
       <template v-slot:cell(meta.numStatements)="data">
         <a
           :href="`${url}/block/${data.item.block.height}/receipts`"
@@ -62,9 +66,7 @@ export default {
           key: 'block.timestamp',
           label: 'Timestamp',
           class: 'd-none d-sm-table-cell',
-          formatter: (value) => {
-            return this.formatTimestamp(value)
-          }
+          formatter: this.$formatter.catapultTime
         },
         {
           key: 'block.signerPublicKey',
@@ -142,9 +144,6 @@ export default {
       } else if (event.key === 'ArrowRight') {
         this.nextBtnClick()
       }
-    },
-    formatTimestamp(str) {
-      return new Date(Number(str) + 1459468800000).toUTCString()
     },
     blockHandler(b) {
       this.$axios.$get(`${this.url}/block/${b.block.height}`).then((res) => {

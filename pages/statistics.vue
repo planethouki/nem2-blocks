@@ -108,16 +108,16 @@ export default {
         title: 'Block time differences (last 241 blocks)'
       },
       difficultyChartOptions: {
-        title: 'Block difficulty (last 240 blocks)'
+        title: 'Block difficulty (last 241 blocks)'
       },
       transactionsChartOptions: {
-        title: 'Transactions per block (last 240 blocks)'
+        title: 'Transactions per block (last 241 blocks)'
       },
       transactionFeeChartOptions: {
-        title: 'Fee per block (last 240 blocks)'
+        title: 'Fee per block (last 241 blocks)'
       },
       transactionFeeMulChartOptions: {
-        title: 'Fee multiplier per block (last 240 blocks)'
+        title: 'Fee multiplier per block (last 241 blocks)'
       },
       blocks: []
     }
@@ -148,19 +148,23 @@ export default {
           if (idx === 0) {
             return [b.height, null, null]
           } else if (idx < 61) {
-            return [b.height, b.timestamp - org[idx - 1].timestamp, null]
+            return [
+              b.height,
+              (b.timestamp - org[idx - 1].timestamp) / 1000,
+              null
+            ]
           }
           return [
             b.height,
-            b.timestamp - org[idx - 1].timestamp,
-            (b.timestamp - org[idx - 60].timestamp) / 60
+            (b.timestamp - org[idx - 1].timestamp) / 1000,
+            (b.timestamp - org[idx - 60].timestamp) / 60 / 1000
           ]
         })
         .slice(1)
       return [
         [
           'Height',
-          'Time Difference (in ms)',
+          'Time Difference (in seconds)',
           'Avg Time Difference (per 60 blocks)'
         ],
         ...q
@@ -230,17 +234,19 @@ export default {
           if (idx === 0) {
             return [b.height, null, null]
           } else if (idx < 61) {
-            return [b.height, b.totalFee, null]
+            return [b.height, b.totalFee / 1000000, null]
           }
           return [
             b.height,
-            b.totalFee,
+            b.totalFee / 1000000,
             org
               .slice(idx - 60, idx)
               .map((b) => b.totalFee)
               .reduce((prev, curr) => {
                 return prev + curr
-              }) / 60
+              }) /
+              60 /
+              1000000
           ]
         })
         .slice(1)

@@ -33,8 +33,21 @@
               responsive
               :items="harvesterData"
               :fields="harvesterTableFields"
+              :tbody-transition-props="transProps"
               class="mt-3"
-            ></b-table>
+            >
+              <template v-slot:cell(fee)="data">
+                <span>{{ $formatter.intPart(data.value) }}</span
+                >.<span class="small">{{
+                  $formatter.fracPart(data.value)
+                }}</span>
+              </template>
+              <template v-slot:cell(signerPublicKey)="data">
+                <a :href="`${url}/account/${data.value}`" target="_blank">{{
+                  data.value
+                }}</a>
+              </template>
+            </b-table>
           </div>
         </div>
       </div>
@@ -64,25 +77,40 @@
                 class="d-flex align-items-center border-bottom my-2 py-2"
               >
                 <div class="p-2 mr-3">
-                  {{ b.height }}
+                  <a :href="`${url}/block/${b.height}`" target="_blank">{{
+                    b.height
+                  }}</a>
                 </div>
-                <div class="text-truncate mx-3">
-                  <div class="text-truncate">
+                <div class="text-truncate mx-3 flex-fill">
+                  <div class="text-truncate" style="max-width: 10rem;">
                     Harvester
                     <span class="text-monospace">
-                      {{ b.signerPublicKey }}
+                      <a
+                        :href="`${url}/account/${b.signerPublicKey}`"
+                        target="_blank"
+                        >{{ b.signerPublicKey }}</a
+                      >
                     </span>
                   </div>
-                  <div>{{ b.numTransactions }} transactions</div>
+                  <div>
+                    <a
+                      :href="`${url}/block/${b.height}/transactions`"
+                      target="_blank"
+                    >
+                      {{ b.numTransactions }}</a
+                    >&nbsp;<small>transactions</small>
+                  </div>
                 </div>
                 <div class="ml-3 text-right">
                   <div class="text-nowrap">
-                    {{ b.totalFee }}
+                    <span>{{ $formatter.intPart(b.totalFee) }}</span
+                    >.<span class="small">{{
+                      $formatter.fracPart(b.totalFee)
+                    }}</span>
                     <small>total fee</small>
                   </div>
                   <div class="text-muted text-nowrap" style="font-size: 80%;">
-                    {{ b.timeDiff }}
-                    <small>ms ago</small>
+                    {{ $formatter.timePass(b.timeDiff) }} ago
                   </div>
                 </div>
               </div>
@@ -105,28 +133,42 @@
                 :key="t.hash"
                 class="d-flex align-items-center border-bottom my-2 py-2"
               >
-                <div class="text-truncate mr-3" style="width: 8rem;">
-                  {{ t.hash }}
+                <div
+                  class="text-truncate text-monospace mr-3"
+                  style="max-width: 4rem;"
+                >
+                  <a :href="`${url}/transaction/${t.hash}`" target="_blank">{{
+                    t.hash
+                  }}</a>
                 </div>
-                <div class="text-truncate mx-3">
-                  <div class="text-truncate">
+                <div class="text-truncate mx-3 flex-fill">
+                  <div class="text-truncate" style="max-width: 10rem;">
                     Sender
                     <span class="text-monospace">
-                      {{ t.signerPublicKey }}
+                      <a
+                        :href="`${url}/account/${t.signerPublicKey}`"
+                        target="_blank"
+                        >{{ t.signerPublicKey }}</a
+                      >
                     </span>
                   </div>
                   <div>
-                    Type
-                    {{ t.type }}
+                    {{ $formatter.txType(t.type) }}
+                    <small>Transaction</small>
                   </div>
                 </div>
                 <div class="ml-3 text-right">
                   <div class="text-nowrap">
-                    {{ t.maxFee }}
+                    <span>{{ $formatter.intPart(t.maxFee) }}</span
+                    >.<span class="small">{{
+                      $formatter.fracPart(t.maxFee)
+                    }}</span>
                     <small>max fee</small>
                   </div>
                   <div class="text-muted text-nowrap" style="font-size: 80%;">
-                    {{ t.height }}
+                    <a :href="`${url}/block/${t.height}`" target="_blank">{{
+                      t.height
+                    }}</a>
                     height
                   </div>
                 </div>
@@ -147,6 +189,9 @@ export default {
   components: { GChart },
   data() {
     return {
+      transProps: {
+        name: 'block-list'
+      },
       harvesterPiChartOptions: {
         title: 'Harvester (last 100 blocks)'
       },
@@ -349,5 +394,15 @@ export default {
 .transaction-list-move,
 .block-list-move {
   transition: transform 0.3s;
+}
+</style>
+
+<style scoped>
+a {
+  color: #35495e;
+  text-decoration: underline;
+}
+a:hover {
+  text-decoration: none;
 }
 </style>
