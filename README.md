@@ -1,8 +1,7 @@
 # nem2-blocks
 
-- for fushicho
+- compatible with fushicho, fushicho2
 - only block information
-- temporary until official block explorer comes out
 
 [demo](http://nem2blocks.z31.web.core.windows.net)
 

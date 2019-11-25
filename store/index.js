@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'fushicho.48gh23s.xyz:3000'
+  return '54.65.82.119:3000'
 })()
 
 export const state = () => ({
