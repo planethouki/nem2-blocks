@@ -191,11 +191,7 @@ export default {
         })
         .slice(1)
       return [
-        [
-          'Height',
-          'Number of transactions',
-          'Avg number of transactions (per 60 blocks)'
-        ],
+        ['Height', 'Block difficulty', 'Avg block difficulty (per 60 blocks)'],
         ...q
       ]
     },

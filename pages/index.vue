@@ -67,9 +67,14 @@
       <div class="col col-12 col-md-6">
         <div class="card m-3">
           <div class="card-body">
-            <h5>
-              Latest blocks
-            </h5>
+            <div class="d-flex justify-content-between">
+              <h5>
+                Latest blocks
+              </h5>
+              <small>
+                <nuxt-link to="/blocks/0">see more</nuxt-link>
+              </small>
+            </div>
             <transition-group name="block-list" tag="div">
               <div
                 v-for="b in latestBlocksData"
@@ -285,12 +290,16 @@ export default {
         })
     },
     harvesterPiChartData() {
-      const q = Object.keys(this.signerToCount).map((signerPublicKey) => {
-        return [
-          signerPublicKey,
-          this.signerToCount[signerPublicKey].harvestCount
-        ]
-      })
+      const q = Object.keys(this.signerToCount)
+        .map((signerPublicKey) => {
+          return [
+            signerPublicKey,
+            this.signerToCount[signerPublicKey].harvestCount
+          ]
+        })
+        .sort((x, y) => {
+          return y[1] - x[1]
+        })
       return [['Signer', 'Count'], ...q]
     },
     latestTransactionsData() {
