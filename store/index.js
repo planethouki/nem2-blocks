@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'api-01.us-east-1.nemtech.network:3000'
+  return 'test-api.48gh23s.xyz:3000'
 })()
 
 export const state = () => ({
