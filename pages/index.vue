@@ -317,7 +317,7 @@ export default {
       return this.blocks.slice(0, 10).map((b) => {
         return {
           hash: b.meta.hash,
-          timeDiff: this.now - Number(b.block.timestamp) - 1459468800000,
+          timeDiff: this.$formatter.catapultTimeDiff(b.block.timestamp),
           height: b.block.height,
           signerPublicKey: b.block.signerPublicKey,
           numTransactions: b.meta.numTransactions,

@@ -11,7 +11,10 @@ Vue.prototype.$formatter = {
     return Math.floor(absoluteXem / 1000000).toString()
   },
   catapultTime(str) {
-    return new Date(Number(str) + 1459468800000).toUTCString()
+    return new Date(Number(str) + 1573430400000).toISOString()
+  },
+  catapultTimeDiff(str) {
+    return Date.now() - Number(str) - 1573430400000
   },
   timePass(ms) {
     return formatDistance(addMilliseconds(new Date(), ms), new Date(), {

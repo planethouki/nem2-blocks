@@ -20,10 +20,10 @@ export const state = () => ({
 
 export const getters = {
   url(state) {
-    return `http://${state.host}`
+    return `${location.protocol}//${state.host}`
   },
   ws(state) {
-    return `ws://${state.host}/ws`
+    return `${location.protocol.replace('http', 'ws')}//${state.host}/ws`
   },
   currentHeight(state) {
     if (state.newBlock.block.height !== undefined) {

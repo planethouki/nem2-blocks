@@ -133,7 +133,7 @@ export default {
             numTransactions: b.meta.numTransactions,
             totalFee: Number(b.meta.totalFee),
             feeMultiplier: b.block.feeMultiplier,
-            difficulty: Number(b.block.difficulty)
+            difficulty: Number(b.block.difficulty) / 100000000000000
           }
         })
         .sort((x, y) => {
