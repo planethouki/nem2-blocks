@@ -1,11 +1,13 @@
 # nem2-blocks
 
-- compatible with fushicho, fushicho2
+- compatible with fushicho3
 - only block information
 
-[demo](http://nem2blocks.z31.web.core.windows.net)
+[demo](https://test-block.48gh23s.xyz)
 
-![alt](cap1.png)
+![dashboard screenshot](cap1.png)
+![block table screenshot](cap2.png)
+![statistics chart screenshot](cap3.png)
 
 ## Build Setup
 
@@ -15,10 +17,6 @@ $ npm run install
 
 # serve with hot reload at localhost:3000
 $ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
 
 # generate static project
 $ npm run generate
