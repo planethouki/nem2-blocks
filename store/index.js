@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'https://test-api.48gh23s.xyz:3001'
+  return 'test-api.48gh23s.xyz:3001'
 })()
 
 export const state = () => ({
