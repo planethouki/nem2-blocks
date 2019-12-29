@@ -172,28 +172,14 @@ export default {
     },
     difficultyChartData() {
       const q = this.blocksForChart
-        .map((b, idx, org) => {
+        .map((b, idx) => {
           if (idx === 0) {
-            return [b.height, null, null]
-          } else if (idx < 61) {
-            return [b.height, b.difficulty, null]
+            return [b.height, null]
           }
-          return [
-            b.height,
-            b.difficulty,
-            org
-              .slice(idx - 60, idx)
-              .map((b) => b.difficulty)
-              .reduce((prev, curr) => {
-                return prev + curr
-              }) / 60
-          ]
+          return [b.height, b.difficulty]
         })
         .slice(1)
-      return [
-        ['Height', 'Block difficulty', 'Avg block difficulty (per 60 blocks)'],
-        ...q
-      ]
+      return [['Height', 'Block difficulty'], ...q]
     },
     transactionsChartData() {
       const q = this.blocksForChart
