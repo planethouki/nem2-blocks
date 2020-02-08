@@ -105,19 +105,19 @@ export default {
   data() {
     return {
       blockTimeChartOptions: {
-        title: 'Block time differences (last 241 blocks)'
+        title: 'Block time differences (last 100 blocks)'
       },
       difficultyChartOptions: {
-        title: 'Block difficulty (last 241 blocks)'
+        title: 'Block difficulty (last 100 blocks)'
       },
       transactionsChartOptions: {
-        title: 'Transactions per block (last 241 blocks)'
+        title: 'Transactions per block (last 100 blocks)'
       },
       transactionFeeChartOptions: {
-        title: 'Fee per block (last 241 blocks)'
+        title: 'Fee per block (last 100 blocks)'
       },
       transactionFeeMulChartOptions: {
-        title: 'Fee multiplier per block (last 241 blocks)'
+        title: 'Fee multiplier per block (last 100 blocks)'
       },
       blocks: []
     }
@@ -143,29 +143,26 @@ export default {
         })
     },
     blockTimeChartData() {
-      const q = this.blocksForChart
-        .map((b, idx, org) => {
-          if (idx === 0) {
-            return [b.height, null, null]
-          } else if (idx < 61) {
-            return [
-              b.height,
-              (b.timestamp - org[idx - 1].timestamp) / 1000,
-              null
-            ]
-          }
-          return [
-            b.height,
-            (b.timestamp - org[idx - 1].timestamp) / 1000,
-            (b.timestamp - org[idx - 60].timestamp) / 60 / 1000
-          ]
-        })
-        .slice(1)
+      const averageWindow = 10
+      const q = this.blocksForChart.map((b, idx, org) => {
+        if (idx === 0) {
+          return [b.height, null, null]
+        } else if (idx < averageWindow + 1) {
+          return [b.height, (b.timestamp - org[idx - 1].timestamp) / 1000, null]
+        }
+        return [
+          b.height,
+          (b.timestamp - org[idx - 1].timestamp) / 1000,
+          (b.timestamp - org[idx - averageWindow].timestamp) /
+            averageWindow /
+            1000
+        ]
+      })
       return [
         [
           'Height',
           'Time Difference (in seconds)',
-          'Avg Time Difference (per 60 blocks)'
+          `Avg Time Difference (per ${averageWindow} blocks)`
         ],
         ...q
       ]
@@ -182,80 +179,75 @@ export default {
       return [['Height', 'Block difficulty'], ...q]
     },
     transactionsChartData() {
-      const q = this.blocksForChart
-        .map((b, idx, org) => {
-          if (idx === 0) {
-            return [b.height, null, null]
-          } else if (idx < 61) {
-            return [b.height, b.numTransactions, null]
-          }
-          return [
-            b.height,
-            b.numTransactions,
-            org
-              .slice(idx - 60, idx)
-              .map((b) => b.numTransactions)
-              .reduce((prev, curr) => {
-                return prev + curr
-              }) / 60
-          ]
-        })
-        .slice(1)
+      const averageWindow = 10
+      const q = this.blocksForChart.map((b, idx, org) => {
+        if (idx < averageWindow + 1) {
+          return [b.height, b.numTransactions, null]
+        }
+        return [
+          b.height,
+          b.numTransactions,
+          org
+            .slice(idx - averageWindow, idx)
+            .map((b) => b.numTransactions)
+            .reduce((prev, curr) => {
+              return prev + curr
+            }) / averageWindow
+        ]
+      })
       return [
         [
           'Height',
           'Number of transactions',
-          'Avg number of transactions (per 60 blocks)'
+          `Avg number of transactions (per ${averageWindow} blocks)`
         ],
         ...q
       ]
     },
     transactionFeeChartData() {
-      const q = this.blocksForChart
-        .map((b, idx, org) => {
-          if (idx === 0) {
-            return [b.height, null, null]
-          } else if (idx < 61) {
-            return [b.height, b.totalFee / 1000000, null]
-          }
-          return [
-            b.height,
-            b.totalFee / 1000000,
-            org
-              .slice(idx - 60, idx)
-              .map((b) => b.totalFee)
-              .reduce((prev, curr) => {
-                return prev + curr
-              }) /
-              60 /
-              1000000
-          ]
-        })
-        .slice(1)
-      return [['Height', 'Fee', 'Avg fee (per 60 blocks)'], ...q]
+      const averageWindow = 10
+      const q = this.blocksForChart.map((b, idx, org) => {
+        if (idx < averageWindow + 1) {
+          return [b.height, b.totalFee / 1000000, null]
+        }
+        return [
+          b.height,
+          b.totalFee / 1000000,
+          org
+            .slice(idx - averageWindow, idx)
+            .map((b) => b.totalFee)
+            .reduce((prev, curr) => {
+              return prev + curr
+            }) /
+            averageWindow /
+            1000000
+        ]
+      })
+      return [['Height', 'Fee', `Avg fee (per ${averageWindow} blocks)`], ...q]
     },
     transactionFeeMulChartData() {
-      const q = this.blocksForChart
-        .map((b, idx, org) => {
-          if (idx === 0) {
-            return [b.height, null, null]
-          } else if (idx < 61) {
-            return [b.height, b.feeMultiplier, null]
-          }
-          return [
-            b.height,
-            b.feeMultiplier,
-            org
-              .slice(idx - 60, idx)
-              .map((b) => b.feeMultiplier)
-              .reduce((prev, curr) => {
-                return prev + curr
-              }) / 60
-          ]
-        })
-        .slice(1)
+      const averageWindow = 10
+      const q = this.blocksForChart.map((b, idx, org) => {
+        if (idx < averageWindow + 1) {
+          return [b.height, b.feeMultiplier, null]
+        }
+        return [
+          b.height,
+          b.feeMultiplier,
+          org
+            .slice(idx - averageWindow, idx)
+            .map((b) => b.feeMultiplier)
+            .reduce((prev, curr) => {
+              return prev + curr
+            }) / averageWindow
+        ]
+      })
       return [
-        ['Height', 'Fee multiplier', 'Avg fee multiplier (per 60 blocks)'],
+        [
+          'Height',
+          'Fee multiplier',
+          `Avg fee multiplier (per ${averageWindow} blocks)`
+        ],
         ...q
       ]
     }
@@ -269,10 +261,8 @@ export default {
       this.$axios
         .$get(`${this.url}/chain/height`)
         .then((res) => {
-          const q = Math.max(Number(res.height) - 241, 1)
-          return this.$axios.$get(
-            `${this.url}/diagnostic/blocks/${q}/limit/241`
-          )
+          const q = Math.max(Number(res.height) - 100, 1)
+          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
         })
         .then((res) => {
           this.blocks = res

@@ -80,7 +80,7 @@ export default {
       this.$router.push('/host')
     },
     getChain() {
-      this.$axios.$get(`${this.url}/diagnostic/storage`).then((res) => {
+      this.$axios.$get(`${this.url}/node/storage`).then((res) => {
         this.$store.dispatch('setStorage', { storage: res })
       })
     },

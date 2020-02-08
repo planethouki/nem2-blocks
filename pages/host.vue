@@ -22,7 +22,7 @@ export default {
       this.$store.dispatch('deleteNewBlock')
       this.$store.dispatch('deleteStorage')
       const storage = await this.$axios.$get(
-        `${this.$store.getters.url}/diagnostic/storage`
+        `${this.$store.getters.url}/node/storage`
       )
       this.$store.dispatch('setStorage', { storage })
       this.$router.push(redirectPath)

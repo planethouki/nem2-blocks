@@ -379,9 +379,7 @@ export default {
         .$get(`${this.url}/chain/height`)
         .then((res) => {
           const q = Math.max(Number(res.height) - 99, 1)
-          return this.$axios.$get(
-            `${this.url}/diagnostic/blocks/${q}/limit/100`
-          )
+          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
         })
         .then((res) => {
           this.blocks = res
