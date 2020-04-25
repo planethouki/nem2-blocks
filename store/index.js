@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'test-api.48gh23s.xyz:3001'
+  return 'jp12.nemesis.land:3001'
 })()
 
 export const state = () => ({
