@@ -1,6 +1,6 @@
 # nem2-blocks
 
-- compatible with fushicho3
+- compatible with gorilla
 - only block information
 
 [demo](https://test-block.48gh23s.xyz)

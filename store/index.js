@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'pentesting2-api.48gh23s.xyz:3001'
+  return 'gorilla-api.48gh23s.xyz:3001'
 })()
 
 export const state = () => ({
