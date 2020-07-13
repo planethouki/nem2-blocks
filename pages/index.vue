@@ -343,7 +343,13 @@ export default {
         })
         .slice(0, 10)
         .map((h) => {
-          return this.$axios.$get(`${this.url}/block/${h}/transactions`)
+          const params = new URLSearchParams()
+          params.append('height', h)
+          return this.$axios
+            .$get(`${this.url}/transactions/confirmed?${params.toString()}`)
+            .then((res) => {
+              return res.data
+            })
         })
       Promise.all(getTransactionsPromises).then((results) => {
         const transactions = []
@@ -375,19 +381,18 @@ export default {
   },
   methods: {
     get() {
+      const params = new URLSearchParams()
+      params.append('pageSize', 100)
+      params.append('order', 'desc')
       this.$axios
-        .$get(`${this.url}/chain/height`)
+        .$get(`${this.url}/blocks?${params.toString()}`)
         .then((res) => {
-          const q = Math.max(Number(res.height) - 99, 1)
-          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
-        })
-        .then((res) => {
-          this.blocks = res
+          this.blocks = res.data
         })
     },
     addNewBlock(newBlock) {
       this.$axios
-        .$get(`${this.url}/block/${newBlock.block.height}`)
+        .$get(`${this.url}/blocks/${newBlock.block.height}`)
         .then((b) => {
           const copy = [b, ...JSON.parse(JSON.stringify(this.blocks))]
           this.blocks = copy.slice(0, 100)

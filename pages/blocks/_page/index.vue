@@ -52,7 +52,7 @@ import { mapGetters } from 'vuex'
 export default {
   components: {},
   validate({ params }) {
-    return /^\d+$/.test(params.height)
+    return /^\d+$/.test(params.page)
   },
   data() {
     return {
@@ -84,15 +84,12 @@ export default {
   computed: {
     ...mapGetters(['url', 'ws', 'currentHeight']),
     prevBtnDisabled() {
-      const height100 = this.floor100(this.$route.params.height)
-      return Number(this.$route.params.height) === 0 ? false : height100 === 1
+      return (
+        Math.ceil(this.currentHeight / 100) === Number(this.$route.params.page)
+      )
     },
     nextBtnDisabled() {
-      const currentHeight100 = this.floor100(this.currentHeight)
-      const height100 = this.floor100(this.$route.params.height)
-      return Number(this.$route.params.height) === 0
-        ? true
-        : currentHeight100 === height100
+      return this.$route.params.page === '1'
     },
     blockItems() {
       return this.blocks.map((b) => {
@@ -120,23 +117,13 @@ export default {
   methods: {
     prevBtnClick() {
       if (this.prevBtnDisabled) return
-      const currentHeight100 = this.floor100(this.currentHeight)
-      const height100 = this.floor100(this.$route.params.height)
-      if (Number(this.$route.params.height) === 0) {
-        this.$router.push(`/blocks/${currentHeight100 - 100}`)
-      } else if (height100 !== 1) {
-        this.$router.push(`/blocks/${height100 - 100}`)
-      }
+      const page = Number(this.$route.params.page) + 1
+      this.$router.push(`/blocks/${page}`)
     },
     nextBtnClick() {
       if (this.nextBtnDisabled) return
-      const currentHeight100 = this.floor100(this.currentHeight)
-      const height100 = this.floor100(this.$route.params.height)
-      if (height100 === 0) {
-        this.$router.push(`/blocks/${currentHeight100}`)
-      } else if (currentHeight100 !== height100) {
-        this.$router.push(`/blocks/${height100 + 100}`)
-      }
+      const page = Number(this.$route.params.page) - 1
+      this.$router.push(`/blocks/${page}`)
     },
     arrowKeyHandler(event) {
       if (event.key === 'ArrowLeft') {
@@ -146,31 +133,22 @@ export default {
       }
     },
     blockHandler(b) {
-      this.$axios.$get(`${this.url}/block/${b.block.height}`).then((res) => {
-        const currentHeight100 = this.floor100(this.currentHeight)
-        const height100 = this.floor100(this.$route.params.height)
-        if (
-          this.$route.params.height === '0' ||
-          currentHeight100 === height100
-        ) {
+      this.$axios.$get(`${this.url}/blocks/${b.block.height}`).then((res) => {
+        if (this.$route.params.page === '1') {
           const copy = [res, ...JSON.parse(JSON.stringify(this.blocks))]
           this.blocks = copy.slice(0, 100)
         }
       })
     },
     render() {
+      const params = new URLSearchParams()
+      params.append('pageSize', 100)
+      params.append('order', 'desc')
+      params.append('pageNumber', this.$route.params.page)
       this.$axios
-        .$get(`${this.url}/chain/height`)
+        .$get(`${this.url}/blocks?${params.toString()}`)
         .then((res) => {
-          const q = this.floor100(
-            this.$route.params.height === '0'
-              ? res.height
-              : this.$route.params.height
-          )
-          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
-        })
-        .then((blocks) => {
-          this.blocks = blocks
+          this.blocks = res.data
         })
     },
     clear() {

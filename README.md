@@ -1,6 +1,6 @@
 # nem2-blocks
 
-- compatible with gorilla
+- compatible with 0.9.6.3
 - only block information
 
 [demo](https://test-block.48gh23s.xyz)

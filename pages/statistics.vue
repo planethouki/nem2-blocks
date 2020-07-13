@@ -258,14 +258,13 @@ export default {
   destroyed() {},
   methods: {
     get() {
+      const params = new URLSearchParams()
+      params.append('pageSize', 100)
+      params.append('order', 'desc')
       this.$axios
-        .$get(`${this.url}/chain/height`)
+        .$get(`${this.url}/blocks?${params.toString()}`)
         .then((res) => {
-          const q = Math.max(Number(res.height) - 100, 1)
-          return this.$axios.$get(`${this.url}/blocks/${q}/limit/100`)
-        })
-        .then((res) => {
-          this.blocks = res
+          this.blocks = res.data
         })
     }
   }

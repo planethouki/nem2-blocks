@@ -5,7 +5,7 @@ const host = (() => {
       return sessionStorageHost
     }
   }
-  return 'gorilla-api.48gh23s.xyz:3001'
+  return process.env.NODE_URL
 })()
 
 export const state = () => ({

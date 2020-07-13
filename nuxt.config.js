@@ -71,5 +71,10 @@ export default {
 
   router: {
     mode: 'hash'
+  },
+
+  env: {
+    NODE_URL: '0963-api.48gh23s.xyz:3001'
+    // NODE_URL: '0963-api.48gh23s.xyz:3000'
   }
 }
