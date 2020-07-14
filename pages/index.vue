@@ -72,7 +72,7 @@
                 Latest blocks
               </h5>
               <small>
-                <nuxt-link to="/blocks/0">see more</nuxt-link>
+                <nuxt-link to="/blocks/1">see more</nuxt-link>
               </small>
             </div>
             <transition-group name="block-list" tag="div">
@@ -82,7 +82,7 @@
                 class="d-flex align-items-center border-bottom my-2 py-2"
               >
                 <div class="p-2 mr-3">
-                  <a :href="`${url}/block/${b.height}`" target="_blank">{{
+                  <a :href="`${url}/blocks/${b.height}`" target="_blank">{{
                     b.height
                   }}</a>
                 </div>
@@ -99,7 +99,7 @@
                   </div>
                   <div>
                     <a
-                      :href="`${url}/block/${b.height}/transactions`"
+                      :href="`${url}/transactions/confirmed?height=${b.height}`"
                       target="_blank"
                     >
                       {{ b.numTransactions }}</a
@@ -142,9 +142,12 @@
                   class="text-truncate text-monospace mr-3"
                   style="max-width: 4rem;"
                 >
-                  <a :href="`${url}/transaction/${t.hash}`" target="_blank">{{
-                    t.hash
-                  }}</a>
+                  <a
+                    :href="`${url}/transactions/confirmed/${t.hash}`"
+                    target="_blank"
+                  >
+                    {{ t.hash }}
+                  </a>
                 </div>
                 <div class="text-truncate mx-3 flex-fill">
                   <div class="text-truncate" style="max-width: 10rem;">
@@ -171,7 +174,7 @@
                     <small>max fee</small>
                   </div>
                   <div class="text-muted text-nowrap" style="font-size: 80%;">
-                    <a :href="`${url}/block/${t.height}`" target="_blank">{{
+                    <a :href="`${url}/blocks/${t.height}`" target="_blank">{{
                       t.height
                     }}</a>
                     height

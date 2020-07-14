@@ -9,7 +9,7 @@
       :tbody-transition-props="transProps"
     >
       <template v-slot:cell(block.height)="data">
-        <a :href="`${url}/block/${data.value}`" target="_blank">{{
+        <a :href="`${url}/blocks/${data.value}`" target="_blank">{{
           data.value
         }}</a>
       </template>
@@ -20,7 +20,9 @@
       </template>
       <template v-slot:cell(meta.numTransactions)="data">
         <a
-          :href="`${url}/block/${data.item.block.height}/transactions`"
+          :href="
+            `${url}/transactions/confirmed?height=${data.item.block.height}`
+          "
           target="_blank"
         >
           {{ data.value }}
