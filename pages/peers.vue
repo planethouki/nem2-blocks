@@ -59,8 +59,17 @@ export default {
   destroyed() {},
   methods: {
     get() {
-      this.$axios.$get(`${this.url}/node/peers`).then((res) => {
-        this.peers = res
+      Promise.all([
+        this.$axios.$get(`${this.url}/node/info`),
+        this.$axios.$get(`${this.url}/node/peers`)
+      ]).then(([info, peers]) => {
+        this.peers = [
+          {
+            ...info,
+            _rowVariant: 'primary'
+          },
+          ...peers
+        ]
       })
     }
   }
