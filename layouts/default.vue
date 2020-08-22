@@ -14,20 +14,11 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-form-input
-            id="input-host"
-            v-model="inputHost"
-            size="sm"
-            class="mr-sm-2"
-            placeholder="Host"
-          ></b-form-input>
-          <b-button size="sm" class="my-2 my-sm-0" @click="changeHost"
-            >Host</b-button
-          >
+          <b-nav-item disabled>{{ host }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-    <nuxt />
+    <nuxt id="content" />
   </div>
 </template>
 
@@ -43,20 +34,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws']),
-    validatedHost() {
-      const a1 = this.inputHost
-      const a2 = a1.trim()
-      const a4 = a2.replace('http://', '')
-      const a7 = a4.replace('https://', '')
-      const a10 = a7.endsWith('/') ? a7.substr(0, a7.length - 1) : a7
-      return a10
-    }
+    ...mapGetters(['url', 'ws', 'blocks', 'host'])
   },
   mounted() {
-    this.inputHost = this.$store.state.host
     this.startWs()
     this.getChain()
+    this.getBlocks().then(() => {
+      this.getTransactions()
+    })
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'host') {
         this.$nextTick(() => {
@@ -70,18 +55,60 @@ export default {
     this.finishWs()
   },
   methods: {
-    changeHost() {
-      this.$store.dispatch('setInfoHostChange', {
-        infoHostChange: {
-          host: this.validatedHost,
-          redirectPath: this.$router.currentRoute.fullPath
-        }
-      })
-      this.$router.push('/host')
-    },
     getChain() {
       this.$axios.$get(`${this.url}/node/storage`).then((res) => {
-        this.$store.dispatch('setStorage', { storage: res })
+        this.$store.commit('storage', { storage: res })
+      })
+    },
+    getBlocks() {
+      const params = new URLSearchParams()
+      params.append('pageSize', 100)
+      params.append('order', 'desc')
+      return this.$axios
+        .$get(`${this.url}/blocks?${params.toString()}`)
+        .then((res) => {
+          this.$store.commit('blocks', { blocks: res.data })
+        })
+    },
+    getTransactions() {
+      if (this.blocks.length === 0) {
+        return
+      }
+      let totalTxCount = 0
+      const blocksHasTx = this.blocks
+        .filter((b) => {
+          return b.meta.numTransactions > 0
+        })
+        .sort((a, b) => {
+          return Number(b.block.height) - Number(a.block.height)
+        })
+      const blocksConstantTx = blocksHasTx
+        .map((b) => {
+          totalTxCount += b.meta.numTransactions
+          return {
+            totalTxCount,
+            ...b
+          }
+        })
+        .filter((b) => {
+          return b.totalTxCount < 20
+        })
+      const getTransactionsPromises = blocksConstantTx.map((b) => {
+        const params = new URLSearchParams()
+        params.append('height', b.block.height)
+        params.append('pageSize', '20')
+        return this.$axios
+          .$get(`${this.url}/transactions/confirmed?${params.toString()}`)
+          .then((res) => {
+            return res.data
+          })
+      })
+      return Promise.all(getTransactionsPromises).then((results) => {
+        const transactions = []
+        for (const result of results) {
+          transactions.push(...result)
+        }
+        this.$store.commit('transactions', { transactions })
       })
     },
     startWs() {
@@ -104,8 +131,23 @@ export default {
     finishWs() {
       if (this.socket) this.socket.close()
     },
-    blockHandler(obj) {
-      this.$store.dispatch('setNewBlock', { newBlock: obj })
+    blockHandler(newBlock) {
+      this.$store.commit('newBlock', { newBlock })
+      this.$axios
+        .$get(`${this.url}/blocks/${newBlock.block.height}`)
+        .then((block) => {
+          this.$store.commit('prependBlock', { block })
+        })
+      const transactionsParams = new URLSearchParams()
+      transactionsParams.append('height', newBlock.block.height)
+      transactionsParams.append('pageSize', '20')
+      this.$axios
+        .$get(
+          `${this.url}/transactions/confirmed?${transactionsParams.toString()}`
+        )
+        .then((res) => {
+          this.$store.commit('prependTransactions', { transactions: res.data })
+        })
       this.getChain()
     }
   }
@@ -119,5 +161,22 @@ export default {
 }
 .page-enter, .page-leave-to /* .page-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+.transaction-list-move,
+.block-list-move {
+  transition: transform 0.3s;
+}
+
+#content {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+#content a {
+  color: #35495e;
+  text-decoration: underline;
+}
+#content a:hover {
+  text-decoration: none;
 }
 </style>

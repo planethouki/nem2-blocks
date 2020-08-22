@@ -76,7 +76,7 @@ export default {
   env: {
     NODE_URL:
       process.env.NODE_ENV === 'development'
-        ? '0963-api.48gh23s.xyz:3000'
-        : '0963-api.48gh23s.xyz:3001'
+        ? '0964-api.48gh23s.xyz:3000'
+        : '0964-api.48gh23s.xyz:3001'
   }
 }

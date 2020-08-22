@@ -14,7 +14,7 @@
         }}</a>
       </template>
       <template v-slot:cell(block.signerPublicKey)="data">
-        <a :href="`${url}/account/${data.value}`" target="_blank">{{
+        <a :href="`${url}/accounts/${data.value}`" target="_blank">{{
           data.value
         }}</a>
       </template>
@@ -105,13 +105,6 @@ export default {
   mounted() {
     document.addEventListener('keyup', this.arrowKeyHandler)
     this.render()
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'newBlock') {
-        this.$nextTick(() => {
-          this.blockHandler(mutation.payload.newBlock)
-        })
-      }
-    })
   },
   destroyed() {
     document.removeEventListener('keyup', this.arrowKeyHandler)
@@ -134,15 +127,14 @@ export default {
         this.nextBtnClick()
       }
     },
-    blockHandler(b) {
-      this.$axios.$get(`${this.url}/blocks/${b.block.height}`).then((res) => {
-        if (this.$route.params.page === '1') {
-          const copy = [res, ...JSON.parse(JSON.stringify(this.blocks))]
-          this.blocks = copy.slice(0, 100)
-        }
-      })
-    },
     render() {
+      if (
+        this.$store.getters.blocks.length > 0 &&
+        Number(this.$route.params.page) === 1
+      ) {
+        this.blocks = this.$store.getters.blocks
+        return
+      }
       const params = new URLSearchParams()
       params.append('pageSize', 100)
       params.append('order', 'desc')
@@ -162,19 +154,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.block-list-move {
-  transition: transform 1s;
-}
-</style>
-
-<style scoped>
-a {
-  color: #35495e;
-  text-decoration: underline;
-}
-a:hover {
-  text-decoration: none;
-}
-</style>

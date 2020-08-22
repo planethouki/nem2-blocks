@@ -10,7 +10,7 @@
     >
       <template v-slot:cell(publicKey)="data">
         <a
-          :href="`${url}/account/${data.value}`"
+          :href="`${url}/accounts/${data.value}`"
           target="_blank"
           class="text-monospace"
         >

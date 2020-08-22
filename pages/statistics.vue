@@ -118,12 +118,11 @@ export default {
       },
       transactionFeeMulChartOptions: {
         title: 'Fee multiplier per block (last 100 blocks)'
-      },
-      blocks: []
+      }
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'currentHeight', 'storage']),
+    ...mapGetters(['url', 'ws', 'currentHeight', 'storage', 'blocks']),
     blocksForChart() {
       return this.blocks
         .map((b) => {
@@ -250,22 +249,6 @@ export default {
         ],
         ...q
       ]
-    }
-  },
-  mounted() {
-    this.get()
-  },
-  destroyed() {},
-  methods: {
-    get() {
-      const params = new URLSearchParams()
-      params.append('pageSize', 100)
-      params.append('order', 'desc')
-      this.$axios
-        .$get(`${this.url}/blocks?${params.toString()}`)
-        .then((res) => {
-          this.blocks = res.data
-        })
     }
   }
 }

@@ -15,10 +15,15 @@ export const state = () => ({
   infoHostChange: {
     host: null,
     redirectPah: null
-  }
+  },
+  transactions: [],
+  blocks: []
 })
 
 export const getters = {
+  host(state) {
+    return state.host
+  },
   url(state) {
     return `${location.protocol}//${state.host}`
   },
@@ -39,6 +44,12 @@ export const getters = {
   },
   storage(state) {
     return state.storage
+  },
+  blocks(state) {
+    return state.blocks
+  },
+  transactions(state) {
+    return state.transactions
   }
 }
 
@@ -55,37 +66,23 @@ export const mutations = {
   },
   infoHostChange(state, { infoHostChange }) {
     state.infoHostChange = infoHostChange
+  },
+  blocks(state, { blocks }) {
+    state.blocks = blocks
+  },
+  prependBlock(state, { block }) {
+    state.blocks = [block, ...state.blocks]
+  },
+  transactions(state, { transactions }) {
+    state.transactions = transactions
+  },
+  prependTransactions(state, { transactions }) {
+    state.transactions = [...transactions, ...state.transactions]
   }
 }
 
 export const actions = {
-  setHost({ commit }, { host }) {
-    commit('host', { host })
-    if (window && window.sessionStorage) {
-      window.sessionStorage.setItem('host', host)
-    }
-  },
-  setNewBlock({ commit }, { newBlock }) {
-    commit('newBlock', { newBlock })
-  },
-  deleteNewBlock({ commit }) {
-    commit('newBlock', { newBlock: { meta: {}, block: {} } })
-  },
   setStorage({ commit }, { storage }) {
     commit('storage', { storage })
-  },
-  deleteStorage({ commit }) {
-    commit('storage', { storage: {} })
-  },
-  setInfoHostChange({ commit }, { infoHostChange }) {
-    commit('infoHostChange', { infoHostChange })
-  },
-  deleteInfoHostChange({ commit }) {
-    commit('infoHostChange', {
-      infoHostChange: {
-        host: null,
-        redirectPah: null
-      }
-    })
   }
 }
