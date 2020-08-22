@@ -12,10 +12,6 @@ export const state = () => ({
   host,
   newBlock: { meta: {}, block: {} },
   storage: {},
-  infoHostChange: {
-    host: null,
-    redirectPah: null
-  },
   transactions: [],
   blocks: []
 })
@@ -64,14 +60,21 @@ export const mutations = {
   storage(state, { storage }) {
     state.storage = storage
   },
-  infoHostChange(state, { infoHostChange }) {
-    state.infoHostChange = infoHostChange
-  },
   blocks(state, { blocks }) {
     state.blocks = blocks
   },
-  prependBlock(state, { block }) {
-    state.blocks = [block, ...state.blocks]
+  addBlock(state, { block }) {
+    const findIndex = state.blocks.findIndex((b) => {
+      return b.block.height === block.block.height
+    })
+    if (findIndex > -1) {
+      state.blocks.splice(findIndex, 1, block)
+    } else {
+      state.blocks = [block, ...state.blocks]
+    }
+    state.blocks.sort((a, b) => {
+      return b.block.height - a.block.height
+    })
   },
   transactions(state, { transactions }) {
     state.transactions = transactions

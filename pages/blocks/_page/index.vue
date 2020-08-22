@@ -1,6 +1,7 @@
 <template>
   <div class="container-fluid">
     <b-table
+      show-empty
       hover
       small
       primary-key="hash"
@@ -39,6 +40,11 @@
         >
           {{ data.value }}
         </a>
+      </template>
+      <template v-slot:empty="scope">
+        <div class="text-center">
+          <b-spinner type="grow" label="Spinning"></b-spinner>
+        </div>
       </template>
     </b-table>
     <b-button :disabled="prevBtnDisabled" @click="prevBtnClick"
@@ -80,7 +86,8 @@ export default {
         { key: 'meta.numStatements', label: 'Stmts' },
         { key: 'meta.totalFee', label: 'Fees' },
         { key: 'block.feeMultiplier', label: 'Fee mul' }
-      ]
+      ],
+      storeSubscription: null
     }
   },
   computed: {
@@ -105,9 +112,18 @@ export default {
   mounted() {
     document.addEventListener('keyup', this.arrowKeyHandler)
     this.render()
+    this.storeSubscription = this.$store.subscribe((mutation, state) => {
+      if (
+        Number(this.$route.params.page) === 1 &&
+        mutation.type === 'addBlock'
+      ) {
+        this.blocks = this.$store.getters.blocks
+      }
+    })
   },
   destroyed() {
     document.removeEventListener('keyup', this.arrowKeyHandler)
+    this.storeSubscription()
   },
   methods: {
     prevBtnClick() {

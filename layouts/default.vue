@@ -136,7 +136,7 @@ export default {
       this.$axios
         .$get(`${this.url}/blocks/${newBlock.block.height}`)
         .then((block) => {
-          this.$store.commit('prependBlock', { block })
+          this.$store.commit('addBlock', { block })
         })
       const transactionsParams = new URLSearchParams()
       transactionsParams.append('height', newBlock.block.height)
