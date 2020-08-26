@@ -45,23 +45,13 @@ export default {
   },
   mounted() {
     this.get()
-    this.$store.subscribe((mutation, state) => {
-      if (
-        mutation.type === 'newBlock' &&
-        state.newBlock.block.height !== undefined
-      ) {
-        this.$nextTick(() => {
-          this.get()
-        })
-      }
-    })
   },
   destroyed() {},
   methods: {
     get() {
       Promise.all([
-        this.$axios.$get(`${this.url}/node/info`),
-        this.$axios.$get(`${this.url}/node/peers`)
+        this.$api.$get(`/node/info`),
+        this.$api.$get(`/node/peers`)
       ]).then(([info, peers]) => {
         this.peers = [
           {
@@ -75,16 +65,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-a {
-  color: #35495e;
-  text-decoration: underline;
-}
-a:hover {
-  text-decoration: none;
-}
-.card {
-  margin-top: 1rem;
-}
-</style>

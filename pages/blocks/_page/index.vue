@@ -155,11 +155,9 @@ export default {
       params.append('pageSize', 100)
       params.append('order', 'desc')
       params.append('pageNumber', this.$route.params.page)
-      this.$axios
-        .$get(`${this.url}/blocks?${params.toString()}`)
-        .then((res) => {
-          this.blocks = res.data
-        })
+      this.$api.$get(`/blocks?${params.toString()}`).then((res) => {
+        this.blocks = res.data
+      })
     },
     clear() {
       this.blocks = []

@@ -11,11 +11,6 @@
           <b-nav-item to="/statistics">Statistics</b-nav-item>
           <b-nav-item to="/peers">Peers</b-nav-item>
         </b-navbar-nav>
-
-        <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item disabled>{{ host }}</b-nav-item>
-        </b-navbar-nav>
       </b-collapse>
     </b-navbar>
     <nuxt id="content" />
@@ -34,7 +29,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'blocks', 'host'])
+    ...mapGetters(['url', 'blocks', 'host'])
   },
   mounted() {
     this.startWs()
@@ -42,21 +37,13 @@ export default {
     this.getBlocks().then(() => {
       this.getTransactions()
     })
-    this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'host') {
-        this.$nextTick(() => {
-          this.finishWs()
-          this.startWs()
-        })
-      }
-    })
   },
   destroyed() {
     this.finishWs()
   },
   methods: {
     getChain() {
-      this.$axios.$get(`${this.url}/node/storage`).then((res) => {
+      this.$api.$get(`/node/storage`).then((res) => {
         this.$store.commit('storage', { storage: res })
       })
     },
@@ -64,11 +51,9 @@ export default {
       const params = new URLSearchParams()
       params.append('pageSize', 100)
       params.append('order', 'desc')
-      return this.$axios
-        .$get(`${this.url}/blocks?${params.toString()}`)
-        .then((res) => {
-          this.$store.commit('blocks', { blocks: res.data })
-        })
+      return this.$api.$get(`/blocks?${params.toString()}`).then((res) => {
+        this.$store.commit('blocks', { blocks: res.data })
+      })
     },
     getTransactions() {
       if (this.blocks.length === 0) {
@@ -97,8 +82,8 @@ export default {
         const params = new URLSearchParams()
         params.append('height', b.block.height)
         params.append('pageSize', '20')
-        return this.$axios
-          .$get(`${this.url}/transactions/confirmed?${params.toString()}`)
+        return this.$cachedApi
+          .$get(`/transactions/confirmed?${params.toString()}`)
           .then((res) => {
             return res.data
           })
@@ -112,7 +97,7 @@ export default {
       })
     },
     startWs() {
-      this.socket = new WebSocket(this.ws)
+      this.socket = new WebSocket(process.env.WS_URL)
       this.socket.onopen = () => {
         // eslint-disable-next-line no-console
         console.log('connection open')
@@ -133,21 +118,21 @@ export default {
     },
     blockHandler(newBlock) {
       this.$store.commit('newBlock', { newBlock })
-      this.$axios
-        .$get(`${this.url}/blocks/${newBlock.block.height}`)
-        .then((block) => {
-          this.$store.commit('addBlock', { block })
-        })
-      const transactionsParams = new URLSearchParams()
-      transactionsParams.append('height', newBlock.block.height)
-      transactionsParams.append('pageSize', '20')
-      this.$axios
-        .$get(
-          `${this.url}/transactions/confirmed?${transactionsParams.toString()}`
-        )
-        .then((res) => {
-          this.$store.commit('prependTransactions', { transactions: res.data })
-        })
+      this.$api.$get(`/blocks/${newBlock.block.height}`).then((block) => {
+        this.$store.commit('addBlock', { block })
+        if (block.meta.numTransactions > 0) {
+          const transactionsParams = new URLSearchParams()
+          transactionsParams.append('height', block.block.height)
+          transactionsParams.append('pageSize', '20')
+          return this.$cachedApi
+            .$get(`/transactions/confirmed?${transactionsParams.toString()}`)
+            .then((res) => {
+              this.$store.commit('prependTransactions', {
+                transactions: res.data
+              })
+            })
+        }
+      })
       this.getChain()
     }
   }

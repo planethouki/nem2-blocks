@@ -27,7 +27,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/formatter.js'],
+  plugins: ['~/plugins/formatter.js', '~/plugins/api.js'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -74,9 +74,9 @@ export default {
   },
 
   env: {
-    NODE_URL:
-      process.env.NODE_ENV === 'development'
-        ? '0964-api.48gh23s.xyz:3000'
-        : '0964-api.48gh23s.xyz:3001'
+    HREF_NODE_BASE_URL: 'http://0964-api.48gh23s.xyz:3000',
+    NODE_URL_THROUGH: `https://d23spg6azktw8s.cloudfront.net`,
+    NODE_URL_CACHED: `https://d23spg6azktw8s.cloudfront.net/cached`,
+    WS_URL: `wss://d23spg6azktw8s.cloudfront.net/ws`
   }
 }

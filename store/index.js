@@ -1,15 +1,4 @@
-const host = (() => {
-  if (window && window.sessionStorage) {
-    const sessionStorageHost = window.sessionStorage.getItem('host')
-    if (sessionStorageHost !== null) {
-      return sessionStorageHost
-    }
-  }
-  return process.env.NODE_URL
-})()
-
 export const state = () => ({
-  host,
   newBlock: { meta: {}, block: {} },
   storage: {},
   transactions: [],
@@ -17,14 +6,8 @@ export const state = () => ({
 })
 
 export const getters = {
-  host(state) {
-    return state.host
-  },
-  url(state) {
-    return `${location.protocol}//${state.host}`
-  },
-  ws(state) {
-    return `${location.protocol.replace('http', 'ws')}//${state.host}/ws`
+  url() {
+    return process.env.HREF_NODE_BASE_URL
   },
   currentHeight(state) {
     if (state.newBlock.block.height !== undefined) {
@@ -50,9 +33,6 @@ export const getters = {
 }
 
 export const mutations = {
-  host(state, { host }) {
-    state.host = host
-  },
   newBlock(state, { newBlock }) {
     state.currentHeight = newBlock.block.height
     state.newBlock = newBlock
