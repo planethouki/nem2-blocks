@@ -122,7 +122,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'currentHeight', 'storage', 'blocks']),
+    ...mapGetters(['url', 'storage', 'blocks']),
     blocksForChart() {
       return this.blocks
         .map((b) => {

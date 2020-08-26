@@ -24,8 +24,7 @@ export default {
   components: {},
   data() {
     return {
-      socket: null,
-      inputHost: ''
+      socket: null
     }
   },
   computed: {
@@ -33,7 +32,8 @@ export default {
   },
   mounted() {
     this.startWs()
-    this.getChain()
+    this.getStorage()
+    this.getHeight()
     this.getBlocks().then(() => {
       this.getTransactions()
     })
@@ -42,7 +42,12 @@ export default {
     this.finishWs()
   },
   methods: {
-    getChain() {
+    getHeight() {
+      this.$api.$get('/chain/height').then((res) => {
+        this.$store.commit('chainHeight', res)
+      })
+    },
+    getStorage() {
       this.$api.$get(`/node/storage`).then((res) => {
         this.$store.commit('storage', { storage: res })
       })
@@ -117,6 +122,8 @@ export default {
       if (this.socket) this.socket.close()
     },
     blockHandler(newBlock) {
+      this.getStorage()
+      this.getHeight()
       this.$store.commit('newBlock', { newBlock })
       this.$api.$get(`/blocks/${newBlock.block.height}`).then((block) => {
         this.$store.commit('addBlock', { block })
@@ -133,7 +140,6 @@ export default {
             })
         }
       })
-      this.getChain()
     }
   }
 }

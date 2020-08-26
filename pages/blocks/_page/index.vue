@@ -91,10 +91,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['url', 'ws', 'currentHeight']),
+    ...mapGetters(['url', 'ws', 'chainHeight']),
     prevBtnDisabled() {
       return (
-        Math.ceil(this.currentHeight / 100) === Number(this.$route.params.page)
+        Math.ceil(this.chainHeight / 100) === Number(this.$route.params.page)
       )
     },
     nextBtnDisabled() {

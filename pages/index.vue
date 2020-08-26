@@ -70,14 +70,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'url',
-      'ws',
-      'storage',
-      'currentHeight',
-      'blocks',
-      'transactions'
-    ])
+    ...mapGetters(['url', 'storage', 'blocks', 'transactions'])
   },
   mounted() {
     this.secondsInterval = setInterval(() => {

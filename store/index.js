@@ -1,5 +1,6 @@
 export const state = () => ({
   newBlock: { meta: {}, block: {} },
+  chainHeight: 0,
   storage: {},
   transactions: [],
   blocks: []
@@ -9,14 +10,8 @@ export const getters = {
   url() {
     return process.env.HREF_NODE_BASE_URL
   },
-  currentHeight(state) {
-    if (state.newBlock.block.height !== undefined) {
-      return state.newBlock.block.height
-    } else if (state.storage.numBlocks !== undefined) {
-      return state.storage.numBlocks
-    } else {
-      return 0
-    }
+  chainHeight(state) {
+    return state.chainHeight
   },
   newBlock(state) {
     return state.newBlock
@@ -36,6 +31,9 @@ export const mutations = {
   newBlock(state, { newBlock }) {
     state.currentHeight = newBlock.block.height
     state.newBlock = newBlock
+  },
+  chainHeight(state, { height }) {
+    state.chainHeight = Number(height)
   },
   storage(state, { storage }) {
     state.storage = storage
