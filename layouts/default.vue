@@ -7,7 +7,7 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item to="/blocks/1">Blocks</b-nav-item>
+          <b-nav-item :to="blocksLink">Blocks</b-nav-item>
           <b-nav-item to="/statistics">Statistics</b-nav-item>
           <b-nav-item to="/peers">Peers</b-nav-item>
         </b-navbar-nav>
@@ -27,79 +27,50 @@ export default {
       socket: null
     }
   },
+  async middleware({ app, store }) {
+    await app.$api.$get('/chain/height').then(({ height }) => {
+      store.commit('blockHeight', height)
+    })
+  },
   computed: {
-    ...mapGetters(['url', 'blocks', 'host'])
+    ...mapGetters(['url', 'blocks', 'blockHeight']),
+    blocksLink() {
+      return `/blocks/${Math.ceil(this.blockHeight / 100)}`
+    }
   },
   mounted() {
     this.startWs()
     this.getStorage()
-    this.getHeight()
-    this.getBlocks().then(() => {
-      this.getTransactions()
-    })
+    this.getLatestBlocks()
   },
   destroyed() {
     this.finishWs()
   },
   methods: {
-    getHeight() {
-      this.$api.$get('/chain/height').then((res) => {
-        this.$store.commit('chainHeight', res)
-      })
-    },
     getStorage() {
       this.$api.$get(`/node/storage`).then((res) => {
         this.$store.commit('storage', { storage: res })
       })
     },
-    getBlocks() {
-      const params = new URLSearchParams()
-      params.append('pageSize', 100)
-      params.append('order', 'desc')
-      return this.$api.$get(`/blocks?${params.toString()}`).then((res) => {
-        this.$store.commit('blocks', { blocks: res.data })
-      })
-    },
-    getTransactions() {
-      if (this.blocks.length === 0) {
-        return
-      }
-      let totalTxCount = 0
-      const blocksHasTx = this.blocks
-        .filter((b) => {
-          return b.meta.numTransactions > 0
-        })
-        .sort((a, b) => {
-          return Number(b.block.height) - Number(a.block.height)
-        })
-      const blocksConstantTx = blocksHasTx
-        .map((b) => {
-          totalTxCount += b.meta.numTransactions
-          return {
-            totalTxCount,
-            ...b
+    getLatestBlocks() {
+      const toBlock = this.blockHeight
+      const fromBlock = toBlock - 10
+      for (let h = fromBlock; h <= toBlock; h++) {
+        this.$cachedApi.$get(`/blocks/${h}`).then((block) => {
+          this.$store.commit('addBlock', { block })
+          if (block.meta.numTransactions === 0) {
+            return
           }
+          const params = new URLSearchParams()
+          params.append('height', block.block.height)
+          params.append('pageSize', '100')
+          return this.$cachedApi
+            .$get(`/transactions/confirmed?${params.toString()}`)
+            .then((res) => {
+              this.$store.commit('addTransactions', { transactions: res.data })
+            })
         })
-        .filter((b) => {
-          return b.totalTxCount < 20
-        })
-      const getTransactionsPromises = blocksConstantTx.map((b) => {
-        const params = new URLSearchParams()
-        params.append('height', b.block.height)
-        params.append('pageSize', '20')
-        return this.$cachedApi
-          .$get(`/transactions/confirmed?${params.toString()}`)
-          .then((res) => {
-            return res.data
-          })
-      })
-      return Promise.all(getTransactionsPromises).then((results) => {
-        const transactions = []
-        for (const result of results) {
-          transactions.push(...result)
-        }
-        this.$store.commit('transactions', { transactions })
-      })
+      }
     },
     startWs() {
       this.socket = new WebSocket(process.env.WS_URL)
@@ -122,23 +93,22 @@ export default {
       if (this.socket) this.socket.close()
     },
     blockHandler(newBlock) {
-      this.getStorage()
-      this.getHeight()
       this.$store.commit('newBlock', { newBlock })
-      this.$api.$get(`/blocks/${newBlock.block.height}`).then((block) => {
+      this.$cachedApi.$get(`/blocks/${newBlock.block.height}`).then((block) => {
         this.$store.commit('addBlock', { block })
-        if (block.meta.numTransactions > 0) {
-          const transactionsParams = new URLSearchParams()
-          transactionsParams.append('height', block.block.height)
-          transactionsParams.append('pageSize', '20')
-          return this.$cachedApi
-            .$get(`/transactions/confirmed?${transactionsParams.toString()}`)
-            .then((res) => {
-              this.$store.commit('prependTransactions', {
-                transactions: res.data
-              })
-            })
+        if (block.meta.numTransactions === 0) {
+          return
         }
+        const transactionsParams = new URLSearchParams()
+        transactionsParams.append('height', block.block.height)
+        transactionsParams.append('pageSize', '100')
+        return this.$cachedApi
+          .$get(`/transactions/confirmed?${transactionsParams.toString()}`)
+          .then((res) => {
+            this.$store.commit('addTransactions', {
+              transactions: res.data
+            })
+          })
       })
     }
   }

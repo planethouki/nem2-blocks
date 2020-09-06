@@ -1,17 +1,17 @@
 export const state = () => ({
   newBlock: { meta: {}, block: {} },
-  chainHeight: 0,
   storage: {},
   transactions: [],
-  blocks: []
+  latestBlocks: [],
+  blockHeight: null
 })
 
 export const getters = {
   url() {
     return process.env.HREF_NODE_BASE_URL
   },
-  chainHeight(state) {
-    return state.chainHeight
+  blockHeight(state) {
+    return state.blockHeight
   },
   newBlock(state) {
     return state.newBlock
@@ -20,7 +20,10 @@ export const getters = {
     return state.storage
   },
   blocks(state) {
-    return state.blocks
+    return state.latestBlocks
+  },
+  latestBlocks(state) {
+    return state.latestBlocks
   },
   transactions(state) {
     return state.transactions
@@ -28,42 +31,40 @@ export const getters = {
 }
 
 export const mutations = {
-  newBlock(state, { newBlock }) {
-    state.currentHeight = newBlock.block.height
-    state.newBlock = newBlock
+  blockHeight(state, height) {
+    state.blockHeight = height
   },
-  chainHeight(state, { height }) {
-    state.chainHeight = Number(height)
+  newBlock(state, { newBlock }) {
+    state.blockHeight = newBlock.block.height
+    state.newBlock = newBlock
   },
   storage(state, { storage }) {
     state.storage = storage
   },
-  blocks(state, { blocks }) {
-    state.blocks = blocks
-  },
   addBlock(state, { block }) {
-    const findIndex = state.blocks.findIndex((b) => {
+    const findIndex = state.latestBlocks.findIndex((b) => {
       return b.block.height === block.block.height
     })
     if (findIndex > -1) {
-      state.blocks.splice(findIndex, 1, block)
-    } else {
-      state.blocks = [block, ...state.blocks]
+      state.latestBlocks.splice(findIndex, 1)
     }
-    state.blocks.sort((a, b) => {
-      return b.block.height - a.block.height
+    state.latestBlocks.push(block)
+    state.latestBlocks.sort((a, b) => {
+      return Number(b.block.height) - Number(a.block.height)
     })
   },
-  transactions(state, { transactions }) {
-    state.transactions = transactions
-  },
-  prependTransactions(state, { transactions }) {
-    state.transactions = [...transactions, ...state.transactions]
-  }
-}
-
-export const actions = {
-  setStorage({ commit }, { storage }) {
-    commit('storage', { storage })
+  addTransactions(state, { transactions }) {
+    transactions.map((transaction) => {
+      const findIndex = state.transactions.findIndex((t) => {
+        return t.meta.hash === transaction.meta.hash
+      })
+      if (findIndex > -1) {
+        state.transactions.splice(findIndex, 1)
+      }
+      state.transactions.push(transaction)
+    })
+    state.transactions.sort((a, b) => {
+      return Number(b.meta.height) - Number(a.meta.height)
+    })
   }
 }

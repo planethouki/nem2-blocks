@@ -75,8 +75,8 @@ export default {
 
   env: {
     HREF_NODE_BASE_URL: 'http://0964-api.48gh23s.xyz:3000',
-    NODE_URL_THROUGH: `https://d23spg6azktw8s.cloudfront.net`,
-    NODE_URL_CACHED: `https://d23spg6azktw8s.cloudfront.net/cached`,
-    WS_URL: `wss://d23spg6azktw8s.cloudfront.net/ws`
+    NODE_URL_THROUGH: `https://d1lifzmlu7xzd1.cloudfront.net`,
+    NODE_URL_CACHED: `https://d23spg6azktw8s.cloudfront.net`,
+    WS_URL: `wss://d1lifzmlu7xzd1.cloudfront.net/ws`
   }
 }
