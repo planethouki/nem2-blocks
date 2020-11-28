@@ -57,7 +57,8 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    extend(config, ctx) {},
+    publicPath: '/n/'
   },
 
   fontawesome: {
@@ -70,7 +71,8 @@ export default {
   },
 
   router: {
-    mode: 'hash'
+    mode: 'hash',
+    base: `/${process.env.npm_package_name}/`
   },
 
   env: {

@@ -1,9 +1,9 @@
 # nem2-blocks
 
-- compatible with 0.9.6.4
+- compatible with symbol testnet 0.10.0.3
 - only block information
 
-[demo](https://test-block.48gh23s.xyz)
+demo https://planethouki.github.io/nem2-blocks/
 
 ![dashboard screenshot](cap1.png)
 ![block table screenshot](cap2.png)
