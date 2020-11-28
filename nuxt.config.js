@@ -75,6 +75,8 @@ export default {
     base: `/${process.env.npm_package_name}/`
   },
 
+  srcDir: 'src/',
+
   env: {
     HREF_NODE_BASE_URL: 'api-01.ap-northeast-1.0.10.0.x.symboldev.network',
     NODE_URL_THROUGH: `https://d2o8j5pgb7wqnq.cloudfront.net`,
