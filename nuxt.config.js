@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 export default {
   mode: 'spa',
   /*
@@ -78,9 +80,9 @@ export default {
   srcDir: 'src/',
 
   env: {
-    HREF_NODE_BASE_URL: 'api-01.ap-northeast-1.0.10.0.x.symboldev.network',
-    NODE_URL_THROUGH: `https://d2o8j5pgb7wqnq.cloudfront.net`,
-    NODE_URL_CACHED: `https://d2o8j5pgb7wqnq.cloudfront.net`,
-    WS_URL: `wss://d2o8j5pgb7wqnq.cloudfront.net/ws`
+    HREF_NODE_BASE_URL: process.env.HREF_NODE_BASE_URL,
+    NODE_URL_THROUGH: process.env.NODE_URL_THROUGH,
+    NODE_URL_CACHED: process.env.NODE_URL_CACHED,
+    WS_URL: process.env.WS_URL
   }
 }
