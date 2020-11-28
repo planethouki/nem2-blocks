@@ -76,7 +76,7 @@ export default {
   },
 
   env: {
-    HREF_NODE_BASE_URL: 'api-01.ap-northeast-1.096x.symboldev.network:3000',
+    HREF_NODE_BASE_URL: 'api-01.ap-northeast-1.0.10.0.x.symboldev.network',
     NODE_URL_THROUGH: `https://d2o8j5pgb7wqnq.cloudfront.net`,
     NODE_URL_CACHED: `https://d2o8j5pgb7wqnq.cloudfront.net`,
     WS_URL: `wss://d2o8j5pgb7wqnq.cloudfront.net/ws`
