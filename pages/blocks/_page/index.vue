@@ -27,7 +27,7 @@
           data.value
         }}</a>
       </template>
-      <template v-slot:cell(meta.numTransactions)="data">
+      <template v-slot:cell(meta.transactionsCount)="data">
         <a
           :href="
             `${url}/transactions/confirmed?height=${data.item.block.height}`
@@ -41,7 +41,7 @@
         <span>{{ $formatter.intPart(data.value) }}</span
         >.<span class="small">{{ $formatter.fracPart(data.value) }}</span>
       </template>
-      <template v-slot:cell(meta.numStatements)="data">
+      <template v-slot:cell(meta.statementsCount)="data">
         <a
           :href="`${url}/block/${data.item.block.height}/receipts`"
           target="_blank"
@@ -87,8 +87,8 @@ export default {
           tdClass: 'text-monospace',
           class: 'd-none d-lg-table-cell'
         },
-        { key: 'meta.numTransactions', label: '#TXes' },
-        { key: 'meta.numStatements', label: 'Stmts' },
+        { key: 'meta.transactionsCount', label: '#TXes' },
+        { key: 'meta.statementsCount', label: 'Stmts' },
         { key: 'meta.totalFee', label: 'Fees' },
         { key: 'block.feeMultiplier', label: 'Fee mul' }
       ],

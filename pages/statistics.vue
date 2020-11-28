@@ -129,7 +129,7 @@ export default {
           return {
             timestamp: Number(b.block.timestamp),
             height: b.block.height,
-            numTransactions: b.meta.numTransactions,
+            transactionsCount: b.meta.transactionsCount,
             totalFee: Number(b.meta.totalFee),
             feeMultiplier: b.block.feeMultiplier,
             difficulty: Number(b.block.difficulty) / 100000000000000
@@ -142,113 +142,40 @@ export default {
         })
     },
     blockTimeChartData() {
-      const averageWindow = 10
       const q = this.blocksForChart.map((b, idx, org) => {
         if (idx === 0) {
-          return [b.height, null, null]
-        } else if (idx < averageWindow + 1) {
-          return [b.height, (b.timestamp - org[idx - 1].timestamp) / 1000, null]
+          return [b.height, null]
+        } else {
+          return [b.height, (b.timestamp - org[idx - 1].timestamp) / 1000]
         }
-        return [
-          b.height,
-          (b.timestamp - org[idx - 1].timestamp) / 1000,
-          (b.timestamp - org[idx - averageWindow].timestamp) /
-            averageWindow /
-            1000
-        ]
       })
-      return [
-        [
-          'Height',
-          'Time Difference (in seconds)',
-          `Avg Time Difference (per ${averageWindow} blocks)`
-        ],
-        ...q
-      ]
+      return [['Height', 'Time Difference (in seconds)'], ...q]
     },
     difficultyChartData() {
       const q = this.blocksForChart
-        .map((b, idx) => {
-          if (idx === 0) {
-            return [b.height, null]
-          }
+        .map((b) => {
           return [b.height, b.difficulty]
         })
         .slice(1)
       return [['Height', 'Block difficulty'], ...q]
     },
     transactionsChartData() {
-      const averageWindow = 10
-      const q = this.blocksForChart.map((b, idx, org) => {
-        if (idx < averageWindow + 1) {
-          return [b.height, b.numTransactions, null]
-        }
-        return [
-          b.height,
-          b.numTransactions,
-          org
-            .slice(idx - averageWindow, idx)
-            .map((b) => b.numTransactions)
-            .reduce((prev, curr) => {
-              return prev + curr
-            }) / averageWindow
-        ]
+      const q = this.blocksForChart.map((b) => {
+        return [b.height, b.transactionsCount]
       })
-      return [
-        [
-          'Height',
-          'Number of transactions',
-          `Avg number of transactions (per ${averageWindow} blocks)`
-        ],
-        ...q
-      ]
+      return [['Height', 'Number of transactions'], ...q]
     },
     transactionFeeChartData() {
-      const averageWindow = 10
-      const q = this.blocksForChart.map((b, idx, org) => {
-        if (idx < averageWindow + 1) {
-          return [b.height, b.totalFee / 1000000, null]
-        }
-        return [
-          b.height,
-          b.totalFee / 1000000,
-          org
-            .slice(idx - averageWindow, idx)
-            .map((b) => b.totalFee)
-            .reduce((prev, curr) => {
-              return prev + curr
-            }) /
-            averageWindow /
-            1000000
-        ]
+      const q = this.blocksForChart.map((b) => {
+        return [b.height, b.totalFee / 1000000]
       })
-      return [['Height', 'Fee', `Avg fee (per ${averageWindow} blocks)`], ...q]
+      return [['Height', 'Fee'], ...q]
     },
     transactionFeeMulChartData() {
-      const averageWindow = 10
-      const q = this.blocksForChart.map((b, idx, org) => {
-        if (idx < averageWindow + 1) {
-          return [b.height, b.feeMultiplier, null]
-        }
-        return [
-          b.height,
-          b.feeMultiplier,
-          org
-            .slice(idx - averageWindow, idx)
-            .map((b) => b.feeMultiplier)
-            .reduce((prev, curr) => {
-              return prev + curr
-            }) / averageWindow
-        ]
+      const q = this.blocksForChart.map((b) => {
+        return [b.height, b.feeMultiplier]
       })
-      return [
-        [
-          'Height',
-          'Fee multiplier',
-          `Avg fee multiplier (per ${averageWindow} blocks)`
-        ],
-        ...q
-      ]
+      return [['Height', 'Fee multiplier'], ...q]
     }
   }
 }

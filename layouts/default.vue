@@ -28,7 +28,7 @@ export default {
     }
   },
   async middleware({ app, store }) {
-    await app.$api.$get('/chain/height').then(({ height }) => {
+    await app.$api.$get('/chain/info').then(({ height }) => {
       store.commit('blockHeight', height)
     })
   },
@@ -58,7 +58,7 @@ export default {
       for (let h = fromBlock; h <= toBlock; h++) {
         this.$cachedApi.$get(`/blocks/${h}`).then((block) => {
           this.$store.commit('addBlock', { block })
-          if (block.meta.numTransactions === 0) {
+          if (block.meta.transactionsCount === 0) {
             return
           }
           const params = new URLSearchParams()
@@ -96,7 +96,7 @@ export default {
       this.$store.commit('newBlock', { newBlock })
       this.$cachedApi.$get(`/blocks/${newBlock.block.height}`).then((block) => {
         this.$store.commit('addBlock', { block })
-        if (block.meta.numTransactions === 0) {
+        if (block.meta.transactionsCount === 0) {
           return
         }
         const transactionsParams = new URLSearchParams()

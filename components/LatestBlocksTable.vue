@@ -30,7 +30,7 @@
               :href="`${url}/transactions/confirmed?height=${b.height}`"
               target="_blank"
             >
-              {{ b.numTransactions }}</a
+              {{ b.transactionsCount }}</a
             >&nbsp;<small>transactions</small>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default {
           timeDiff: this.$formatter.catapultTimeDiff(b.block.timestamp),
           height: b.block.height,
           signerPublicKey: b.block.signerPublicKey,
-          numTransactions: b.meta.numTransactions,
+          transactionsCount: b.meta.transactionsCount,
           totalFee: Number(b.meta.totalFee)
         }
       })
