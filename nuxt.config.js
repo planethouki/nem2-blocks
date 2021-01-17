@@ -35,8 +35,7 @@ export default {
    */
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
-    '@nuxtjs/eslint-module',
-    '@nuxtjs/google-analytics'
+    '@nuxtjs/eslint-module'
   ],
   /*
    ** Nuxt.js modules
@@ -46,7 +45,8 @@ export default {
     'bootstrap-vue/nuxt',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    'nuxt-fontawesome'
+    'nuxt-fontawesome',
+    '@nuxtjs/google-gtag'
   ],
   /*
    ** Axios module configuration
@@ -86,7 +86,17 @@ export default {
     NODE_URL_CACHED: process.env.NODE_URL_CACHED,
     WS_URL: process.env.WS_URL
   },
-  googleAnalytics: {
-    id: process.env.GOOGLE_ANALYTICS
+
+  'google-gtag': {
+    id: process.env.GTAG,
+    config: {
+      anonymize_ip: true, // anonymize IP
+      send_page_view: false, // might be necessary to avoid duplicated page track on page reload
+      linker: {
+        domains: ['planethouki.github.io']
+      }
+    },
+    debug: true, // enable to track in dev mode
+    disableAutoPageTrack: false // disable if you don't want to track each page route with router.afterEach(...).
   }
 }
