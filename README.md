@@ -1,6 +1,6 @@
 # nem2-blocks
 
-- compatible with symbol testnet 0.10.0.5
+- compatible with symbol testnet 0.10.0.7
 - only block information
 
 demo https://planethouki.github.io/nem2-blocks/
