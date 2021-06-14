@@ -9,6 +9,18 @@
         <b-navbar-nav>
           <b-nav-item :to="blocksLink">Blocks</b-nav-item>
         </b-navbar-nav>
+        <b-navbar-nav class="ml-auto">
+          <div>
+            <iframe
+              src="https://ghbtns.com/github-btn.html?user=planethouki&repo=nem2-blocks&type=star&count=true"
+              frameborder="0"
+              scrolling="0"
+              width="100"
+              height="20"
+              title="GitHub"
+            ></iframe>
+          </div>
+        </b-navbar-nav>
       </b-collapse>
     </b-navbar>
     <nuxt id="content" />

@@ -14,7 +14,7 @@ demo https://planethouki.github.io/nem2-blocks/
 - [ ] mainnet support
 - [ ] harvester address
 - [ ] unit test
-- [ ] github link
+- [x] github link
 
 ## Build Setup
 
