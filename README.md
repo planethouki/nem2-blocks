@@ -15,6 +15,7 @@ demo https://planethouki.github.io/nem2-blocks/
 - [ ] dashboard statistics blocks delete
 - [ ] mainnet support
 - [ ] harvester address
+- [ ] unit test
 
 ## Build Setup
 
