@@ -9,6 +9,13 @@ demo https://planethouki.github.io/nem2-blocks/
 ![block table screenshot](cap2.png)
 ![statistics chart screenshot](cap3.png)
 
+## todo
+
+- [ ] 1.0.x.0 testnet compatible
+- [ ] dashboard statistics blocks delete
+- [ ] mainnet support
+- [ ] harvester address
+
 ## Build Setup
 
 ``` bash
