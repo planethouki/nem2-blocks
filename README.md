@@ -12,7 +12,7 @@ demo https://planethouki.github.io/nem2-blocks/
 ## todo
 
 - [ ] 1.0.x.0 testnet compatible
-- [ ] dashboard statistics blocks delete
+- [x] dashboard statistics blocks delete
 - [ ] mainnet support
 - [ ] harvester address
 - [ ] unit test
