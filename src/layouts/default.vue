@@ -43,45 +43,18 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['url', 'blocks', 'blockHeight']),
+    ...mapGetters(['url', 'blockHeight']),
     blocksLink() {
       return `/blocks/${Math.ceil(this.blockHeight / 100)}`
     }
   },
   mounted() {
     this.startWs()
-    this.getStorage()
-    this.getLatestBlocks()
   },
   destroyed() {
     this.finishWs()
   },
   methods: {
-    getStorage() {
-      this.$api.$get(`/node/storage`).then((res) => {
-        this.$store.commit('storage', { storage: res })
-      })
-    },
-    getLatestBlocks() {
-      const toBlock = this.blockHeight
-      const fromBlock = toBlock - 10
-      for (let h = fromBlock; h <= toBlock; h++) {
-        this.$cachedApi.$get(`/blocks/${h}`).then((block) => {
-          this.$store.commit('addBlock', { block })
-          if (block.meta.transactionsCount === 0) {
-            return
-          }
-          const params = new URLSearchParams()
-          params.append('height', block.block.height)
-          params.append('pageSize', '100')
-          return this.$cachedApi
-            .$get(`/transactions/confirmed?${params.toString()}`)
-            .then((res) => {
-              this.$store.commit('addTransactions', { transactions: res.data })
-            })
-        })
-      }
-    },
     startWs() {
       this.socket = new WebSocket(process.env.WS_URL)
       this.socket.onopen = () => {
@@ -106,19 +79,6 @@ export default {
       this.$store.commit('newBlock', { newBlock })
       this.$cachedApi.$get(`/blocks/${newBlock.block.height}`).then((block) => {
         this.$store.commit('addBlock', { block })
-        if (block.meta.transactionsCount === 0) {
-          return
-        }
-        const transactionsParams = new URLSearchParams()
-        transactionsParams.append('height', block.block.height)
-        transactionsParams.append('pageSize', '100')
-        return this.$cachedApi
-          .$get(`/transactions/confirmed?${transactionsParams.toString()}`)
-          .then((res) => {
-            this.$store.commit('addTransactions', {
-              transactions: res.data
-            })
-          })
       })
     }
   }
