@@ -1,6 +1,6 @@
 # nem2-blocks
 
-- compatible with symbol testnet 0.10.0.7
+- compatible with symbol testnet 1.0.x.0
 - only block information
 
 demo https://planethouki.github.io/nem2-blocks/
@@ -9,7 +9,7 @@ demo https://planethouki.github.io/nem2-blocks/
 
 ## todo
 
-- [ ] 1.0.x.0 testnet compatible
+- [x] 1.0.x.0 testnet compatible
 - [x] dashboard statistics blocks delete
 - [ ] mainnet support
 - [ ] harvester address
