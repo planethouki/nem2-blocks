@@ -5,9 +5,7 @@
 
 demo https://planethouki.github.io/nem2-blocks/
 
-![dashboard screenshot](cap1.png)
 ![block table screenshot](cap2.png)
-![statistics chart screenshot](cap3.png)
 
 ## todo
 
@@ -16,6 +14,7 @@ demo https://planethouki.github.io/nem2-blocks/
 - [ ] mainnet support
 - [ ] harvester address
 - [ ] unit test
+- [ ] github link
 
 ## Build Setup
 
